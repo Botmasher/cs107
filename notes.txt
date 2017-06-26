@@ -1,0 +1,23 @@
+STANFORD CS107
+https://see.stanford.edu/Course/CS107
+
+0. First Day of Class :D
+	- CS106b/x prereq, looks like lots of compsci problem types/abstractions
+	- requires lots of C++, first few wks have work cut out for you
+	- MUST know:
+		- arrays
+		*- pointers
+		- references
+		- classes
+		*- dynamic memory allocation
+		- recursion
+		- linked lists
+		- binary search trees
+		- hashing
+		- iterators
+		*- function pointers
+		- decomposition
+	- Syllabus (points above) and Resources list on the class page
+		- C++, Purify, vi/xemacs, gdb, Scheme
+
+1. 
