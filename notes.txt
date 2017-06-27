@@ -20,4 +20,84 @@ https://see.stanford.edu/Course/CS107
 	- Syllabus (points above) and Resources list on the class page
 		- C++, Purify, vi/xemacs, gdb, Scheme
 
+(
+C++ Review Course from http://www.cplusplus.com/doc/tutorial/
+
+
+// sample program to add two numbers
+00000	10011110
+00001	11110100
+00010	10011110
+00011	11010100
+00100	10111111
+00101	00000000
+
+// same program in C++ to compile
+int a, b, sum;
+     
+cin >> a;
+cin >> b;
+             
+sum = a + b;
+cout << sum << endl;
+
+
+/*
+ * 	Example program anatomy
+ */
+
+#include <iostream> 			// preprocessor directive (here: include standard i/o ops)
+								// blank line
+int main() 						// function declaration; "main" is special in C++
+{
+  std::cout << "Hello World!"; 	// print to screen using character out; << is the insertion op
+}
+
+// same output but introducing namespace visibility to allow for unqualified cout
+#include <iostream>
+using namespace std;
+int main() { cout << "Hello World!"; }
+
+
+/*
+ * 	Variables
+ */
+
+// Fundamental types (see below for compound types like strings)
+char s 					// at least 8 bits
+char 16_t s 			// at least 16 bits
+char 32_t s 			// at least 32 bits
+wchar_t s 				// largest supported char set
+signed char x 			// at least 8 bits
+signed short int x 	 	// at least 16 bits
+signed int x 			// at least 16 bits
+signed long int x 		// at least 32 bits
+signed long long int x 	// at least 64 bits
+unsigned... 			// for ints, same as signed counterparts
+float
+double
+long double
+bool
+void
+decltype(nullptr) 		// null pointer
+
+// c-like vs constructor vs uniform initialization
+int x = 0;
+int x (0);
+int x {0};
+
+// Type deduction
+auto y = x; 		// y deduced to be int
+decltype(x) y; 		// y deduced to be int
+
+// Compound types like strings
+#include <iostream>
+#include <string> 				// include preprocessor directive
+int main () {
+	string s = "my text"; 		// initialize
+	std::cout << s  << endl; 	// endl manipulator prints newline and flushes stream
+}
+
+)
+
 1. 
