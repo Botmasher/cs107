@@ -98,6 +98,44 @@ int main () {
 	std::cout << s  << endl; 	// endl manipulator prints newline and flushes stream
 }
 
+// Constants
+75
+0113 	// 75 in octal
+0x4b 	// 75 in hex
+75u 	// unsigned suffix
+75l 	// long suffix
+75ul 	// unsigned long suffix
+75lu 	// unsigned long suffix
+6.02f 	// float
+3.14L 	// long
+'c' 	// character literal
+"char" 	// string literal
+const double pi = 3.14 	// convenient way to set and use a const instead of literal
+
+#define PI 3.14 		// preprocessor definitions for const instead
+#define NEWLINE '\n' 	// identifier -> replacement (#define IDENTIFIER REPLACEMENT)
+
+// operators
+y = 2 + (x=3) 	// assignment operations can be evaluated
+++x;
+x+=1;
+
+// relational and comparison operators 	== != > < >= <=
+
+// logical operators 	! || &&
+
+// ternary ?
+
+// comma for multiple assignment ,
+
+// bitwise & | ^ ~ << >>
+
+// explicit type casting
+int i = (int) 3.14;
+
+// get size of one type or one variable in bytes
+x = sizeof (char);
+
 )
 
 1. 
