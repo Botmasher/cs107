@@ -2,140 +2,158 @@ STANFORD CS107
 https://see.stanford.edu/Course/CS107
 
 0. First Day of Class :D
-	- CS106b/x prereq, looks like lots of compsci problem types/abstractions
-	- requires lots of C++, first few wks have work cut out for you
-	- MUST know:
-		- arrays
-		*- pointers
-		- references
-		- classes
-		*- dynamic memory allocation
-		- recursion
-		- linked lists
-		- binary search trees
-		- hashing
-		- iterators
-		*- function pointers
-		- decomposition
-	- Syllabus (points above) and Resources list on the class page
-		- C++, Purify, vi/xemacs, gdb, Scheme
+- CS106b/x prereq, looks like lots of compsci problem types/abstractions
+- requires lots of C++, first few wks have work cut out for you
+- MUST know:
+	- arrays
+	*- pointers
+	- references
+	- classes
+	*- dynamic memory allocation
+	- recursion
+	- linked lists
+	- binary search trees
+	- hashing
+	- iterators
+	*- function pointers
+	- decomposition
+- Syllabus (points above) and Resources list on the class page
+	- C++, Purify, vi/xemacs, gdb, Scheme
 
-(
-C++ Review Course from http://www.cplusplus.com/doc/tutorial/
+LECTURE 1 6/29/2017
+- C
+	- imperative paradigm, verb/function-oriented
+	- C++ myobject -> dothis (data being manipulated)
+	- that's why C++ is object- not function-oriented
+	- many people think in C even while C++, sticking w functional not obj
+- Assembly
+	- show you how a line like j++ translates
+	- C++ doesn't execute as C++
+	- show how everything compiles to 0s and 1s
+	- see how C++ and C almost look the same when compiling
+	- gives you idea as to why crashing
+- Concurrent
+	- we do it in C at the moment
+	- all programs prior to 107 have been sequential
+	- pipelined/parallel instructions instead of clean streams
+	- within a single program, get 2 funcs to (seemingly) run simultaneously
+	- tends to switch back and forth so fast can't really see the diff
+	- networking in particular, it's very useful
+	- however, problems come up (e.g. transactional, shared resources)
+	- banks and airlines worried about giving away resources
+- Scheme
+	- related to Lisp
+	- functional paradigm representative
+	- 2 things interesting vs C/C++
+		- always rely on return value of func to move forward
+		- program without side effects
+	- such a small language and fun
+- Python
+	- instead of advanced C++ or Java (108 is all about Java)
+	- as "a more modern, object-oriented version of PERL"
+	- web programming boring, lots of HMTL, but Python has libraries
+	- "great libraries", object-oriented, functional ideas even allowed
+	- good vehicle for parsing and protocols
+- Next time, low-level pointer stuff!
+
+From the transcript but not in the vid:
+- C more difficult but used by longtimers
+- by the end you'll be able to read this: **&**P -> ***=7
 
 
-// sample program to add two numbers
-00000	10011110
-00001	11110100
-00010	10011110
-00011	11010100
-00100	10111111
-00101	00000000
+LECTURE 2
+- Low-level mem mechanics, how everything represented 0 1
+- C/C++
+	- bool, char, short, int, long, float, double
+	- short, int, long all rep scalars
+	- float and double for arbitrarily precise numbers
+ 	char 		1 byte
+	short 		2 bytes
+	int 		4 bytes
+	long 		4 bytes
+	float 		4 bytes (finite mem tries to do inf precis)
+	double 		8 bytes
+- binary digit => bit
+	- EE think of transistors, hi/lo voltages)
+	- CS just think in terms of 2 vals
+	- more interesting taken in groups
+	- each bit adopts value independently of others
+	- therefore 8 bits can distinguish 2**8 values
+- chars 
+	- epresented in mem backed by some num e.g. A is 65
+	- 'A' = 65 but actually some sum of powers of 2 (64+1)
+	- 8 is 2**3, etc.
+	- looking at all transistors would look like 01000001
+	- think of powers of 2 at that position, e.g. 1 at 2**6
+- shorts
+	- 2 sets of 8 bits separated in 2 boxes
+	- contribution of 2 to the whatever again
+	- now go up you can get 2 to the 9th, etc. (2 bytes)
+	- 0 followed by all 1s is 1 less than 2 to that power
+	- 0 to 2**16-1 is range, BUT -2**15 to 2**15-1 instead 
+	- the leftmost bit is SIGN not the MAGNITUDE
+	- hogs a bit more memory if the second byte is all 0s
+	- SIGN BIT: addition/sub use 2'S COMPLEMENT not 1'S C!
+		- invert all bits, then add 1 in the 2**0 col!
+	- want just as many negs as pos, so leftmost is neg/pos
 
-// same program in C++ to compile
-int a, b, sum;
-     
-cin >> a;
-cin >> b;
-             
-sum = a + b;
-cout << sum << endl;
+char ch = 'A';
+short s = ch; 	// don't need a cast for that, it's the num
+cout << s << endl;
+// prints 65 because ch just puts 65 in its bites
+// then s has extra byte 0s and a "smear" of 65 in 1st byte
 
+- shorts assigned to a char will punt on the extra byte!
 
-/*
- * 	Example program anatomy
- */
+- same thing it init a short as an int
+	- just BIT PATTERN copy; remember this is electronics
+	- no patience for dealing with the other 2 bytes
 
-#include <iostream> 			// preprocessor directive (here: include standard i/o ops)
-								// blank line
-int main() 						// function declaration; "main" is special in C++
-{
-  std::cout << "Hello World!"; 	// print to screen using character out; << is the insertion op
-}
+short s = -1;
+	- tricky representation: 2 bytes all 1s!!
+	- this is so you can add to get pos 1
+int i = s;
+	- NOT simple BIT PATTERN copy like the above cases
+	- now the domino effect goes on into the other 2 bytes
+	- the other 2 bytes are now full of 1s
 
-// same output but introducing namespace visibility to allow for unqualified cout
-#include <iostream>
-using namespace std;
-int main() { cout << "Hello World!"; }
+- floats
+	- 32 bits with a leftmost sign bit
+	- think it's 2 to the 30 all the way down to 2 ** 0?
+	- NOPE! could use contributions of 2 to negative num?
+	- NOPE! instead don't cut it into bytes equally
+		- have 1 of 32 bits as sign
+		- next 8 bits are unsigned EXPONENT only
+		- remaining 23 bits are 2**-1, 2**-2, 2**-3
+	- in other words, it's
+		(-1)**SIGN (1.xxxxxx * 2 ** exp-127)
+	- tries to get dec as close to .999....
+	- this is how floats rep in memory
 
+// what happens when assign int to float or float to int
+//	- has to evaluate what number the original bit pattern
+//	- THEN has to lay out NEW bit pattern in float!
+int i = 5;
+float f = i;
+// lots of 0s followed by 0101 at the end, you know
+cout << f << endl;
+// you'll get the number 5
+// 5.0 totally different bit pattern tho
+5 => 5.0 => 1.25*2**2
 
-/*
- * 	Variables
- */
+// can also just evaluate the location of i
+int i = 37;
+float f = *(float*)&i;
+// &i  		we point to the address of i (type int*)
+// (float*) we coax into thinking of the SAME bits as float
+// * 		we dereference it, getting the value pointed at
+// IF PRINTED will just get a really small number
+// (because the float is a bunch of right 1s)
 
-// Fundamental types (see below for compound types like strings)
-char s 					// at least 8 bits
-char 16_t s 			// at least 16 bits
-char 32_t s 			// at least 32 bits
-wchar_t s 				// largest supported char set
-signed char x 			// at least 8 bits
-signed short int x 	 	// at least 16 bits
-signed int x 			// at least 16 bits
-signed long int x 		// at least 32 bits
-signed long long int x 	// at least 64 bits
-unsigned... 			// for ints, same as signed counterparts
-float
-double
-long double
-bool
-void
-decltype(nullptr) 		// null pointer
-
-// c-like vs constructor vs uniform initialization
-int x = 0;
-int x (0);
-int x {0};
-
-// Type deduction
-auto y = x; 		// y deduced to be int
-decltype(x) y; 		// y deduced to be int
-
-// Compound types like strings
-#include <iostream>
-#include <string> 				// include preprocessor directive
-int main () {
-	string s = "my text"; 		// initialize
-	std::cout << s  << endl; 	// endl manipulator prints newline and flushes stream
-}
-
-// Constants
-75
-0113 	// 75 in octal
-0x4b 	// 75 in hex
-75u 	// unsigned suffix
-75l 	// long suffix
-75ul 	// unsigned long suffix
-75lu 	// unsigned long suffix
-6.02f 	// float
-3.14L 	// long
-'c' 	// character literal
-"char" 	// string literal
-const double pi = 3.14 	// convenient way to set and use a const instead of literal
-
-#define PI 3.14 		// preprocessor definitions for const instead
-#define NEWLINE '\n' 	// identifier -> replacement (#define IDENTIFIER REPLACEMENT)
-
-// operators
-y = 2 + (x=3) 	// assignment operations can be evaluated
-++x;
-x+=1;
-
-// relational and comparison operators 	== != > < >= <=
-
-// logical operators 	! || &&
-
-// ternary ?
-
-// comma for multiple assignment ,
-
-// bitwise & | ^ ~ << >>
-
-// explicit type casting
-int i = (int) 3.14;
-
-// get size of one type or one variable in bytes
-x = sizeof (char);
-
-)
-
-1. 
+float f = 7.0;
+short s = *(short*)&f; 	// loc in mem from leftmost spot
+// looks similar prob except figures different sizes
+// ALWAYS cuts from leftmost point because that's pointer!
+// lay them out, you'll see right 2 bytes ignored
+// assumes is short, just replicates left bit pattern
+// so you just get smear of the left 2 bytes!
