@@ -112,3 +112,80 @@ int i = (int) 3.14;
 
 // get size of one type or one variable in bytes
 x = sizeof (char);
+
+// standard io
+#include <iostream>
+using namespace std;
+int main () {
+	int age;
+	cin >> age;
+	cout << age << endl;
+}
+
+// io treat string as stream
+#include <iostream>
+#include <string>
+#include <sstream>
+using namespace std;
+int main () {
+	// separate process of getting input from interpreting data
+	string s;
+	int age;
+	int year;
+	cout << "Your age: ";
+	getline (cin,s);
+	stringstream (s) >> age;
+	cout << "Year: ";
+	getline (cin,s);
+	stringstream (s) >> year;
+	cout << "It is " << year << " and you are " << age << endl;
+	return 0;
+}
+
+/*
+ * 	Statements and flow control
+ */
+// indentation and line breaks no effect
+if (x) { cout << "Value: "; cout << x; }
+
+// branches
+if (x)
+	cout << x;
+else
+	cout << "not x";
+
+// while and do while loops
+while (x < 100) {}
+do {} while (x != 100)
+
+// for loops; all semicolons required even blank
+// terminology:
+// 		for (INITIALIZATION; CONDITION; INCREASE) {}
+for (int n=0; n>0; --n) {}
+for (;n>0;) {}
+for (n=0, i=10; n!=i; ++n, --i) {}
+
+// range-based for loop
+// 		for ( declaration : range ) statement;
+for (char c : string ) {}
+
+// break and continue "jump" statements
+
+// goto "jump" statement: identify a label and then goto
+// 	/!\ unconditional jump, ignores nesting, no auto stack unwinding
+int main () {
+	int n = 3;
+newlabel:
+	--n;
+	if (n>0) goto newlabel;
+}
+
+// switch case
+switch (x) {
+	case 1:
+	case 2:
+	case 3:
+		break;
+	default:
+		cout << "x!"
+}
