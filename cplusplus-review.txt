@@ -189,3 +189,68 @@ switch (x) {
 	default:
 		cout << "x!"
 }
+
+
+/*
+ * 	Functions
+ */
+// main() is the only function called automatically
+// all other funcs exec from main
+int add (int a, int b) {
+	int res;
+	res = a + b;
+	return res;
+}
+int main() {
+	int z = 4 + add (5, 3);
+	cout << z << endl;
+}
+
+// return 0 is implicit in main(), though some programmers prefer explicit
+int main () {
+	return 0;
+}
+
+// calling functions w params taken by values causes copies of values to be made
+// passing by reference no longer does copy but var itself!
+void duplicate (int& a) {
+	a*=2;
+}
+
+int main() {
+	int x = 1;
+	duplicate (x);
+	cout << x << endl;
+	return 0;
+}
+
+
+// to make sure that ref vars not modified, make the params constant
+int add (const int& a, const int& b) {
+	return a+b;
+}
+// extremely popular for compound types (e.g. string)
+// extremely efficient for params of compound types
+
+
+// use INLINE to tell compiler to insert the statements inline
+// instead of using function overhead like stacked arguments, jumps, ...
+inline string concatenate (const string& x, const string& y) {
+	return x+y;
+}
+// done automatically in some compilers when they see efficiency gain anyhow
+
+// default val
+int integerstuff (int x=0) {}
+
+// declaring prototype of a function (define it somewhere else in code)
+int prototype (int, int); 	// notice that param names not needed but types are
+// useful in cases where functions required before defined, e.g. mutual checks
+
+// recursivity
+long factorial (long a) {
+	if (a > 1)
+		return (a * factorial (a-1));
+	else
+		return 1;
+}
