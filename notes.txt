@@ -157,3 +157,141 @@ short s = *(short*)&f; 	// loc in mem from leftmost spot
 // lay them out, you'll see right 2 bytes ignored
 // assumes is short, just replicates left bit pattern
 // so you just get smear of the left 2 bytes!
+
+
+LECTURE 3
+
+// clarifying confusion (we understood, some students did not)
+double d = 3.1416;
+char ch = *(char*)&d;
+// the actual bit pattern is irrelevant
+// this is an expression on the address of d
+// seduced into thinking it's storing the ref of a single char
+// pretending to be char for lifetime of char ch statement
+
+short s = 45;
+double d = *(double*)&s;
+// most still applies, but mysterious:
+// &s address assoc c that arrow
+// now that thinks pointed to 8-byte double, so
+// also assigns the bytes that follow
+// byte pattern is 45 + more bytes
+
+- big endian, little endian
+	- 2-byte short c a 1 preceded by 0s is true for .5 systems out there
+	- in other .5 are little endian, bigger magnitude bytes follow to R!
+	- bit copy btwn big e machines to little e machines get difft shorts
+
+// 4 bytes stacked on top of 4 more bytes
+// address of entire struct ALWAYS coincident c first field address
+// pi. denom on top, pi.num below (pi.num is where arrow points)
+// don't know if it's num OR the entire struct that's being pointed
+struct fraction {
+	int num;
+	int denom;
+}
+fraction pi;
+pi.num = 22; 	// places 22 at 0 offset from base of entire struct
+pi.denom = 7; 	// places 7 at 4 bytes above base of struct
+// knows that denom is 4 bytes above the address of the num
+
+/*
+ * NOW INVADE pi.denom's space using QUIRKY SYNTAX
+ * 	- change it's value using references
+ */
+&(pi.denom) 			// gets an int*
+(fraction*)&(pi.denom)	// gets address of pi.denom as if it's fraction*
+// arrow travels to struct and identifies num as place that should receive 12
+((fraction*)&(pi.denom))->num = 12;
+// travel to fraction struct and identify num field to receive the 12
+// this replaces pi.denom from 7 to 12 "behind pi.denom's back"!
+
+// now we smear the bytes above pi.denom with 33
+// even though no way of legally accessing this because stored above struct
+((fraction*)&(pi.denom))->denom = 33;
+
+// note that to access this now you'd workaroudn to get back to those bytes
+((fraction*)&(pi.denom))[0].denom;
+
+- array is COMPLETELY synonymous with ADDRESS of the ZEROTH ENTRY
+int array[10];
+array[0] = 44;
+array[9] = 100;
+array[5] = 45;
+array[11] = 1; 		// might succeed or crash based on touching local vars
+					// NOT because of bounce checking
+// THEOREM: array <-> &array[0]
+// NO bounce checking on raw arrays, so array[11]=1 tries to place 1!!
+// same with array[-4]=77
+
+// THEOREM: array+k <-> &array[k]
+// you're doing pointer arithmetic, the boundaries between ints
+// k automatically scaled based on the type system (e.g. int 4 bytes wide)
+
+// THEOREM: *array <-> array[0]
+// THEOREM: *(array+k) <-> array[k]
+*(array-4) = 77; 	// brings you 16 bytes before
+
+int arr[5];
+arr[3]=128; 		// bits fit and updated in right half of box 3
+(short*)arr; 		// now thinks arr stores shorts
+(short*) arr[6]=2; 	// writes a 2 in the left half of index 3's bytes!!
+cout << arr[3] << endl; 	// prints out both left and right bits!
+
+((short*)(((char*)(&arr[1])+8))[3]=100; 	// writes 100 way after array
+
+- in C we don't write generics, we leverage the fact we know
+	- size of everything
+	- and bit pattern of everything
+
+// 16 byte struct
+struct student{
+	// no string class in C++, so char arrays ending with null char
+	char* name; 	// store address of zeroth char
+	char suid[8]; 	// 2x 4 array blocks above name
+	int numUnits; 	// int bytes above suid blocks
+}
+// now lay out 4 student structs side by side (like array)
+student pupils[4];
+pupils[0].numUnits=21; 	// 21 goes in topmost field of zeroth struct
+// dynamically alloc enough space for "Adam" then returns addr of "A"
+// makes enough space for \0 (end character)
+pupils[2].name = strdup("Adam");
+
+// NOW do some funkiness using those structs
+pupils[3].name = pupils[0].suid+6; 	// do pointer arithmetic agst a char*
+// strcpy just sees 
+strcpy(pupils[1].suid, "40415xx"); 		// copy characters to suid
+	// make SURE that it's char address under your jurisdiction - was fine
+strcpy(pupils[3].name, "123456"); 		// copy characters to field
+	// was NOT fine - [3]'s.name pointer changed above, so now
+	// we're writing into pupils[0].suid+6 !!!!!
+	// better make sure you own that mem if you're writing char or whatever
+pupils[7].suid[11]='A'; 			// still does manual arithm to find!
+
+- free up memory using FREE (like DELETE in other lang)
+- if print out chars in char array from an index, prints all chars to right
+	- final /0 doesn't print out 'naccount of being weird rep of empty string
+
+// bit pattern swapping
+void swap(int *ap, int *bp)
+{
+	// I know that ap and bp are just pointers to x box and y box
+	int temp = *ap;
+	// temp is now smeared with whatever the value of ap is
+	*ap = *bp; 	// space addressed by ap is now set to what bp evaluates to
+	*bp = temp; // achieve the swap
+}
+int x=7;
+int y=117;
+// C has no templates and no references, just addresses
+// knows where to go to move byte patterns around
+swap(&x,&y);
+
+- in other langs we'd templatize (generic)
+ 	- see we can do swaps, etc. using info learned last 2 lectures
+ 	- it's not hacky, it's beautiful
+
+
+LECTURE 4
+
