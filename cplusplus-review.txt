@@ -254,3 +254,38 @@ long factorial (long a) {
 	else
 		return 1;
 }
+
+// overloaded functions
+int add (int a, int b) {
+	return (a+b);
+}
+double add (double a, double b) {
+	return (a+b);
+}
+
+// template types using CLASS or TYPENAME (synonymous)
+template <class SomeType>
+SomeType add (SomeType a, SomeType b) {
+	return a+b;
+}
+
+// template arguments
+template <typename T>
+T add (T a, T b) {
+	T sum = a+b; 	// notice local var of type T
+	return sum;
+}
+// then when called in main()
+add<int> (x,y);
+
+
+// compile time not run time for template params!
+template <class T, int N>
+T fixed_mult (T val) {
+	return val * N;
+}
+// therefore second template arg must be constant here
+int main() {
+	fixed_mult<int,2> (3); 	// creates func that ALWAYS multiplies by 2
+							// and then passes it in a 3
+}
