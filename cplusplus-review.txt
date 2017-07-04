@@ -289,3 +289,29 @@ int main() {
 	fixed_mult<int,2> (3); 	// creates func that ALWAYS multiplies by 2
 							// and then passes it in a 3
 }
+
+// visibility, local scope until end of block, namespaces
+// namespace identifier { named_entities }
+namespace myInts {
+	int a,b;
+}
+myInts::a;
+
+// declaring multiple segments in the same namespace
+namespace a { int a; }
+namespace b { int b; }
+namespace a { int b; }
+
+// using keyword for namespaces
+using namespace a;
+
+// or in main()
+int main() {
+	using namespace a;
+}
+
+// global and namespace vars allocated for duration of program
+// STATIC vars vs AUTOMATIC storage for local vars
+	// AUTOMATIC only avail in block in which declared; after that mem can be used for other
+	// non-explicit STATIC initialize to 0
+	// non-explicit AUTOMATIC do not initialize
