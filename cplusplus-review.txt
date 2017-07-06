@@ -315,3 +315,27 @@ int main() {
 	// AUTOMATIC only avail in block in which declared; after that mem can be used for other
 	// non-explicit STATIC initialize to 0
 	// non-explicit AUTOMATIC do not initialize
+
+
+// Arrays as contiguous mem loc using same identifier and proper index
+int a [4] = { 1, 77759, 22, 6 };
+// empty brackets when initialization vals present
+int a [] = { 1, 77759, 22, 6 };
+int x = a[2];
+
+// multid arrays
+char dimensions [3][10];
+
+// arrays as params
+void myfunc (int arg[]); 	// omit the size
+
+// container library arrays
+#include <iostream>
+#include <array>
+int main() {
+	array<int, 2> a { 0, 1200 };
+	int size = a.size();
+	int zeroth = a[0];
+	for (int e : a)
+		std::cout << e << endl;
+}
