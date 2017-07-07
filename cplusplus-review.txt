@@ -339,3 +339,32 @@ int main() {
 	for (int e : a)
 		std::cout << e << endl;
 }
+
+
+// character sequences - up to n elements and end in \0 character
+char word[] = { 'H', 'e', 'l', 'l', 'o', '\0' };
+word[1]; 	// => 'e'
+
+// string literals
+char word[] = "Hello"; 	// actually regular array w \0 appended automatically
+
+// cin and cout support null-terminated sequences directly
+cout << "Hello";
+
+// transforming into strings implicitly
+char c[] = "text";
+string s = "asdf";
+s = c;
+cout << s; 	// => "asdf"
+
+/*
+ *	Pointers
+ * 
+ * sequential, unique physical addresses for each cell in memory
+ * generally, OS not C++ decides particular locations in runtime
+ * C++ can obtain address
+ */
+
+// address-of operator
+y = x; 		// value (content) of x
+y = &x; 	// location of x
