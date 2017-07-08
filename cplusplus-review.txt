@@ -366,5 +366,55 @@ cout << s; 	// => "asdf"
  */
 
 // address-of operator
-y = x; 		// value (content) of x
-y = &x; 	// location of x
+y = x; 			// value (content) of x
+y = &x; 		// location of x
+
+// dereference
+val_x = *y; 	// store the content of x (set var equal to value pointed to by y)
+// note that *y and y are NOT the same
+// * and & are complementary
+*y == x; 		// will be true above
+
+// declaring a pointer: type * name
+int * num; 	// asterisk indicates it is a pointer
+char * c;
+
+// declaring multiple pointers requires multiple *
+int * x1, * x2; 		// both are pointers
+int * x1, x2; 			// x1 is pointer, x2 just int!
+
+// arrays are like pointers to their first element
+int a[5];
+int* p;
+
+// main diff is pointers assigned new address, arrays cannot
+p = a; 		// valid assigment - can assign a different address
+a = p; 		// invalid assigment because array is always same block of 5 int
+
+// both valid and equivalent expressions
+a[5] = 0;
+*(a+5) = 0;
+
+// pointer arithmetic
+// only addition and subtraction
+char *c;
+++c; 		// points to the next location in memory of a character
+			// the size of a char in bytes (1) is thus added to pointer
+long *l;
+++l; 		// points to the next location in memory of a long
+			// the size of a long in bytes (4) is thus added to pointer
+
+// these are identical to above
+c = c + 1;
+l = l + 1;
+
+// dereference with pointer arithmetic
+*p++; 	 	// increments pointer but dereferences original address
+		// note that postfix ++ increments separately from dereferencing
+*(p++); 	// same as above
+*++p; 		// dereferences incremented address, same as *(++p)
+++*p; 		// increment the value of the pointer
+(*p)++; 	// post-increment the value of the pointer (so that increments last)
+
+// given above, point p to q and THEN increment both values
+*p++ = *q++;
