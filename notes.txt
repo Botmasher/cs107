@@ -294,4 +294,134 @@ swap(&x,&y);
 
 
 LECTURE 4
+// more notes on swap to clarify
+- that int swap thing above again
+	- I don't care they're ints, I want to exchange the REPRESENTATIONS
+	- then when I go back to this, the bit patterns are exchanged
+	- now when they look at each other, they'll be each other's ints!
+- that's the 107 bent, bc it declares a 4-byte figure replicated in that box
+- it's REALLY a bit-pattern rotation
+- I CANNOT use this to swap doubles
 
+// version of swap that's not constrained to 4 bytes
+void swap(void * vp1, void * vp2, int size) {
+	// vp1 and vp2 now just point to something starting at generic address
+	// void * may be anything, it's NOT meaning this is nothing
+	// int size is the number of figures being swapped - this is key info
+		// as long as I exchange the byte bit pattern, I'm swapping them
+	char buffer[size]; 	// setting aside enough space to hold size bytes
+	memcpy(buffer, vp1, size); // like strcpy but no \0, explicit byte size
+	memcpy(vp1, vp2, size);  	// replicating over space
+	memcpy(vp2, buffer, size); 	// now rotate stuff stored in buffer
+}
+
+// the old swap WOULD NOT WORK for generics but "heart is in the right place"
+// cannot declare void types and cannot initialize w unknown byte info
+void temp = *vp1; 	// void isn't a type, plus we don't know size of vp1
+*vp1 = *vp2;
+*vp2 = temp; 		// so the rest of this won't work because of above
+
+// ugliness
+- problems with using a buffer and mem copy
+	char buffer[size]; 	// some C compilers expect buffer size to be a constant
+
+- lots and lots of things can be disguised as void*
+ 	int x = 17, y = 37;
+ 	swap(&x,&y,sizeof(int)); 	// OK!
+
+ 	double d=π, e=e;
+ 	swap(&d,&e,sizeof(double)); // called a lot gives copies of code for each type
+ 	// no compiler errors even though issues arise
+
+- using generics and casts RISKS MORE on runtime, telling compiler not to bother
+ 	int i = 44;
+ 	short s = 5;
+ 	swap(&i,&s,sizeof(short)); 	// mem setup will only accept 2 bytes of short
+ 	// survives compilation
+ 	// BUT => short's bits end up in int's left 2 bytes + 44 and 0 alone for s!!
+
+- imagine you did sizeof(int) above instead
+ 	- possibly worse, as you're grabbing whatever bytes are right of s to swap!
+
+- data types that are already pointers
+	char * husband = strdup("Fred"); 	// strdup for indep copies of strings here
+	char * wife = strdup("Wilma");
+
+	- in heap |F|r|e|d|\0| and |W|i|l|m|a|\0|
+	- but our variables are pointers to those things, they are not those things
+	- now I want association from one string to other and vice versa
+	swap (&husband,&wife,sizeof(char*));
+
+	- I want to exchange the two things held by husband and wife variables
+	- if I want to exchange two char*, I have to pass in addresses to swap
+	- if copy address of the char*, happens to be replicated char* material
+	- so the pointer addresses are being exchanged, not the values themselves!
+	- NOTHING happens to the characters themselves, they stay put!
+	- PROBLEM: if you forget to add the address ampersand, will compile
+	swap (husband,wife,sizeof(char*));
+		- store address of the actual characters (F and W)
+		- those characters are evaluated and passed directly to vp1 and vp2
+		- copies Wilm\0 and then Freda\0 (size of char* being 4 bytes)
+		- worse, that's now the pattern WITHIN the char*, so...
+		- we now have a char* husband with an address of Wilm!
+
+- Moral: compiler usually tells you if problem, but NOT with generics
+
+- linear search of first instance of key in array
+	// good old homeworky implementation
+	int lsearch(int key, int array[], int size) {
+		for (int i=0; i<size; i++) {
+			if (array[i]==key) {
+				return i;
+			}
+		}
+		return -1;
+	}
+- pay attention to all that's going on in line if(array[i]==key)
+	- the array
+ 	- implicit pointer in array notation
+	- bitwise comparison in ==
+ 	- lose the ability to compare two integers when don't know what they are
+- framing a generic version
+	- array [             ]
+	- i=0 to i=0 advance needs size info about how big elements are
+	- manually compute what the addresses are
+	- need comparison function to compare key to material in array
+		- specify key by address, specify array by address
+		- compare the two pointers, actually material at those addresses
+		- know the size of each element in the array
+		- decide whether or not they match and compare on next iteration
+
+	void *lsearch(void *key, void *base, int n, int elemSize) {
+		for(int i=0; i<n; i++) {
+			// now compute the address of the ith element
+			void *elemAddr = (char*)base + i*elemSize; 	// "the void* hack"
+				// seduce base so that we CAN do pointer math here
+			 	// fine to assign to void* bc going more to less specific here
+				// recall base identifies base address of the entire array
+			// now compare elemSize bytes at addresses for dead match
+			if (memcmp(key,elemAddr,elemSize)==0) return elemAddr;
+				// works for bool, shorts, chars, longs, ints, doubles, floats
+				// but DOES NOT work well for character pointers, strings, structs
+				// you REALLY should deal with function pointers
+		}
+		return NULL;
+	}
+
+	- the only reason for hack is for compiler to accept void* pointer arithmetic
+		- char* because it's 4 bytes long enough to do normal math
+		- some people use unsigned longs instead, still for the 4 bytes
+	- in array[i] the i is implicitly multiplied by sizeof(int) for you
+		- so you're doing some of the compiler's work with (char*)base+i*elemSize
+	- *(array+i) 	multiplies behind the scenes by sizeof(int)
+
+	// prototype for another iteration of this function
+
+	void *lsearch (void *key, void *base, int n, int elemSize, int (*cmpfn)(void*, void*)) {
+	}
+	- 5th parameter has to be a pointer to a function that takes any two void*
+	- this comparison function will return 0, 1, -1
+	- this is how you use it as a client searching array using generic version
+
+
+LECTURE 5
