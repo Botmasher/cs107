@@ -418,3 +418,64 @@ l = l + 1;
 
 // given above, point p to q and THEN increment both values
 *p++ = *q++;
+
+
+// pointer & const
+int x;
+int y;
+const int * p = &y;
+x = *p; 	// ok
+*p = x; 	// error
+
+int x;
+int * p1 = &x; 		
+const int * p2a = &x; 		// const pointer to int
+int const * p2b = &x; 		// same, const pointer to int
+int * const p3 = &x; 		// pointer to const int
+const int * const p4 = &x;
+
+// pointer & string literal
+const char * s = "hello";
+	// now points to first element of char array |'h'|'e'|'l'|'l'|'o'|'\0'|
+
+s[2] 	// since pointers and arrays behave basically same
+*(s+2)  // since pointers and arrays behave basically same
+
+// pointers to pointers
+// syntax: asterisk "for each level of indirection in the declaration"
+char c;
+char * cp;
+char ** cpp; 	// cpp is of type char **
+c = 'a';
+cp = &c;
+cpp = &cp;
+ 	// result: cpp box contains cp's address, cp contains c's address, c contains 'a'
+
+// void pointers
+void * data; 		// just point to any data type, doesn't grab fixed # blocks
+// CANNOT be directly dereferenced ( since they have no type )
+// SO must convert to concrete data type to deref
+// used to handle generics in methods
+
+// invalid and null pointers
+int * p;			// not initialized to any value
+int a[9];
+int * q = a+10; 	// out of bounds but NOT error
+	// no errors here - pointers can point to any address
+	// DEREFERENCING such a pointer will cause a problem, however
+
+// point to nowhere
+int * p = 0;
+int * q = nullptr; 	// compares equal to 0
+int * r = NULL; 	// constant in older code
+	// don't confuse with void, which can point somewhere without type!
+
+// function pointer - usu for passing as arg to another function
+int operation (int x, int y, int (*func)(int,int)) {
+	int calc = (*func)(x,y);
+	return (calc);
+}
+
+// passing around and assigning a function
+int subtraction (int a, int b) { return (a-b); }
+int minus (int, int) = subtraction;
