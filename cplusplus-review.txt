@@ -479,3 +479,41 @@ int operation (int x, int y, int (*func)(int,int)) {
 // passing around and assigning a function
 int subtraction (int a, int b) { return (a-b); }
 int minus (int, int) = subtraction;
+
+
+/*
+ * Dynamic memory
+ * for when mem needs must be determined at runtime
+ */
+
+// new, SYNTAX: pointer = new type;
+// new[], SYNTAX: pointer = new type[number of elements];
+int x = new int[5];
+	// allocates space for 5 ints and returns pointer to first int
+	// x is now a pointer to zeroth element, so x[1] and *(x+1) both work as expected
+
+// BIG differences between new and normal declaration
+int x[5]; 				// needs constant expression determined when designing program
+int x = new int[5]; 	// dynamic memory allocated during runtime with any variable as size
+
+// allocated by system from heap; NO GUARANTEE that new is successful
+x = new int[5]; 			// if alloc fails => exception of type bad_alloc
+x = new (nothrow) int [5]; 	// nothrow object as arg for new, now can check for nullptr
+if (x == nullptr) {}
+	// exception generally preferred though, since less efficient to check nullptr explicitly
+
+// operators delete and delete[]
+// since dynamic mem only needed during specific times in program
+delete pointer; 	// releases mem of a single element allocated using new keyword
+delete[] pointer; 	// releases mem allocated for arrays using new keyword
+	// argument to delete must be either pointer or block alloc by new OR a nullptr
+	// if it's a case of nullptr, works but produces no effect
+
+// variables and inability to allocate
+int * a = new (nowthrow) int[i];
+	// user could pass value for i too big for system to allocate
+if (p == nullptr) { cout << "Error: memory could not be allocated"; }
+
+// C language memory blocks
+malloc, calloc, realloc, free 	// blocks allocated by these funcs not compatible with new
+	// avail in C++ but do not mix with new/delete because each handled by own funcs or operators
