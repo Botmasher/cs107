@@ -578,3 +578,72 @@ stores * current_store = &my_local_store;
 my_local_store.name;
 my_local_store.sale_product.price;
 current_store->sale_product.weight;
+
+// Type Aliases provide abstraction or avoid long/confusing names
+typedef char C; 	// syntax: typedef existing_type new_type_name;
+typedef unsigned int WORD;
+typedef char * pC;
+typedef char text_field [50];
+
+text_field txt;
+pC char_array;
+
+// more recent C++
+using C = char;
+
+// Unions
+	// identified by type_name occupy same phys space in mem
+union type_name {
+	member_type1 member_name1;
+	member_type2 member_name2;
+} object_names;
+
+// Unions often used to access all or part of value stored in mem blocks
+union mix_t {
+	int l;
+	struct {
+		short hi;
+		short lo;
+	} s;
+	char c[4];
+} mix;
+
+// mix.l, mix.s, mix.c give us access to same 4 bytes, but can access as if difft types
+	// (one int, two shorts, one char array)
+	// in little-endian systems, the .hi and c[0] are leftmost
+
+// Anonymous unions used with struct
+struct book1_t {
+	char title [50];
+	char author [50];
+	union {
+		float dollars;
+		int yen;
+	} price;
+} book1;
+book1.price.yen; // access the yen from named union
+
+struct book2_t {
+	char title [50];
+	char author [50];
+	union {
+		float dollars;
+		int yen;
+	} ;
+} book2;
+book2.yen; 		// access the yen from anonymous union
+	// /!\ yen and dollars occupy same place in mem, so one or other set but not both
+
+// Enum, mebers of which are implicitly convertible to ints 
+enum colors_t {black=1, white, red, blue, green}; 	// set to count from 1
+colors_t my_color;
+my_color = blue;
+
+// Enum types with enum class
+enum class Colors {black, white, red, blue, green};
+Colors color;
+color = Colors::blue;	// enumerator vals must each be scoped into its own type
+
+// control over type of enum class
+enum class HairColor : char { brown, black, blond, white, other };
+	// HairColor has distinct type of same size as char
