@@ -425,3 +425,122 @@ void temp = *vp1; 	// void isn't a type, plus we don't know size of vp1
 
 
 LECTURE 5
+void *lsearch (void *key, void *base, int n, int elemSize, int (*cmpfn)(void*,void*)) {
+	// don't care about specific data type
+	for (int i=0; i<n, i++) {
+		// compute address of each element
+		void *elemAddr = base + i*elemSize; 		// typeless pointer
+		void *elemAddr = (char*)base + i*elemSize;  // so hack for a sec instead
+		if (cmpfn(key, elemAddr) == 0) { 	// tell C compiler I know how to compare these
+			return elemAddr; 	// it matches key we are looking for
+		}
+	}
+	return NULL; 	// sentinel that nothing worked out
+}
+	// the hard part isn't linear search, but the pointer math
+
+int array[] = {4,2,3,7,11,6}; 	// shorthand initialization
+// now search for the integer 7
+int size = 6; 		// actually know how big my boxes are
+int number = 7; 	// set aside space for key I'm interested in
+int *found = lsearch (&number,array,6,sizeof(int),IntCmp);
+if (found==NULL) { 
+	// sadness
+} else {
+	//happiness
+}
+
+// write the implementation to match prototype
+int IntCmp (void *elem1, void *elem2)
+{
+	// since I know they're really ints, I reinterpret them
+	int *ip1 = elem1; 	// compiler understands does not need a cast
+	int *ip2 = elem2;
+	return *ip1 - *ip2;
+}
+
+- not elegant, but it's what C can do for Generics
+- BUT is very fast and only does one copy for all our lsearching
+	- NO code bloat like other langs or worse implementations
+
+// problem: now search through array of char* for a particular char*
+char *notes[] = {"Ab","F#","B","Gb","D"}; 	// not in heap, like global vars
+char *favoriteNote = "Eb";
+char **found = 	// to search through array for my favorite note
+	lsearch(&favoriteNote,notes,5,sizeof(char*),StrCmp);
+	// ampersand because I want true data type of key to be same as arrows compared to it
+
+- StrCmp will return NULL or one of the five arrows to one of the char*
+	- size of char* and char** are identical because pointers same length
+	- but elegant for sizeof to be data type whose size I'm jumping through in mem boxes
+
+int StrCmp(void *vp1, void *vp2)
+{
+	// cast to make things typesafe
+	char *s1 = *(char**)vp1; 	// because it's a pointer to a char*, so we want the char*
+		// needed that because we put & before first element, since it was just a char array
+	char *s2 = *(char**)vp2;
+		// this is a char**, since it's our array of character arrays
+	return strcmp(s1,s2); 	// now I pass to C lib func that knows to brute force compare
+		// will give 0, -1 or 1
+}
+
+- Generic bsearch algorithm is the C builtin to do binary search
+void *bsearch (void *key, void *base, int n, int elemSize, int(*cmp)(void*, void*))
+	// n here as always is size of array
+{
+	// note you can pass to key addr of ANYTHING as long as first arg knows it's addr of sth
+	// NOT EVERY block of code that takes params is a func
+	// BUT HERE we mean ones that aren't members of an object
+		// bc those keep around "invisible" address of a "this"
+}
+
+- so many notes on the function and on this pointer bc of problems people have
+- this is passed around, evaluates to address of object being manipulated
+- that's what makes method difft from function, and why the above reqs a funct not a method
+
+/* 
+ * Implement a stack data structure, int specific
+ */
+	- keep in mind we have no templates or classes or vectors like C++!
+	- separate behavior and implementation by .h and .c scheme
+	- as close to a class as possible using just C syntax below!
+// my stack.h file
+typedef struct {
+	int * elems; 		// the location of an array
+	int logicalLen; 	// implicit boundary between what's in use and not in use
+	int allocLength; 	// how long the array is
+} stack; 		// now all 3 fields are exposed (explicitly public)
+// expected now: do NOT manipulate the 12 bytes in struct, just use functions to interact
+void StackNew(stack *s);
+void StackDispose(stack *s);
+void StackPush(stack *s, int value);
+int StackPop(stack *s);
+
+stack s; 		// we know it's a big box with 3 fields stacked on top of each other
+StackNew(&s); 	// we know location of the stack, so now CLEAR IT OUT!
+	// reset logical len to 0, the length of our array to 4, and int *elems to new array
+	// when we get to 5 bytes we'll have to add (on StackPush) another 4-byte array
+	// we'll have to manually compute to house the next push call
+
+for (int i=0; i<5; i++) {
+	StackPush(&s,i);
+}
+	// we'll put 0, 1, 2, 3, 4 on logical length
+	// on very last iteration, we panic and double, set aside space for 8
+	// copy data that was already there, point to the bigger house :D
+	// now I can lay down ints 4, 5, ...
+StackDispose(&s);
+
+void StackNew(stack *s) {
+	// know that s is local var, assume it's 12-bytes stacked on each other
+	s->logicallen = 0; 	// arrow operator because through pointer to stack
+	s->alloclen=4;
+	s->elems=malloc(4*sizeof(int)); 	// get this many (16) bytes and return address
+	assert(s->elems!=NULL); 		// test, no-op if true, ends program if false
+		// need this in case malloc failed and returned NULL
+		// don't want say program to crash because we deref a NULL pointer somewhere
+		// segfaults and buserrors would happen, ASSERTS are better
+		// BUT don't want asserts to customer because it makes it clear your code failed
+}
+

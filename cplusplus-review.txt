@@ -477,9 +477,9 @@ int operation (int x, int y, int (*func)(int,int)) {
 }
 
 // passing around and assigning a function
+int subtraction (int, int);
 int subtraction (int a, int b) { return (a-b); }
 int minus (int, int) = subtraction;
-
 
 /*
  * Dynamic memory
@@ -517,3 +517,64 @@ if (p == nullptr) { cout << "Error: memory could not be allocated"; }
 // C language memory blocks
 malloc, calloc, realloc, free 	// blocks allocated by these funcs not compatible with new
 	// avail in C++ but do not mix with new/delete because each handled by own funcs or operators
+
+/*
+ * Data Structures
+ */
+struct type_name {
+	member_type1 member_name1;
+	member_type2 member_name2;
+} object_names;
+
+// sample implementation
+// many objects declarable from single structure type
+struct product {
+	double price;
+	int weight;
+} ;
+product strawberry;
+product banana;
+
+// or also
+struct product {
+	double price;
+	int weight;
+} strawberry, banana;
+
+// dot syntax between object name and member name
+strawberry.weight; 	// of type int
+
+// objects are also variables of type (here of type product)
+// construct databases of structs using them as type of arrays
+struct type_name {
+	member_type1 member_name1;
+} object_name [n];
+
+// point to struct using own type of pointer
+product * banana_pointer = &banana;
+	// the value is the address of banana
+
+// arrow -> is dereference op specifically for struct members
+banana_pointer->price;
+(*banana_pointer).price; 	// essentially equivalent for our purposes
+
+// careful because this is different!
+*banana_pointer.price;
+ 	// should == *(banana_pointer.price) which expects price to be a pointer!
+
+a.b == (*&a).b;
+a->b == (*a).b;
+*a.b == *(a.b);
+
+// nested structures
+struct stores {
+	string name;
+	product sale_product;
+} my_local_store;
+
+stores * current_store = &my_local_store;
+
+// now all the following are valid
+my_local_store.name;
+my_local_store.sale_product.price;
+current_store->sale_product.weight;
