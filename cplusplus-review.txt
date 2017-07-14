@@ -647,3 +647,46 @@ color = Colors::blue;	// enumerator vals must each be scoped into its own type
 // control over type of enum class
 enum class HairColor : char { brown, black, blond, white, other };
 	// HairColor has distinct type of same size as char
+
+
+/*
+ *	Classes
+ */
+
+class cname {
+	access_specifier1: member1;
+	access_specifier2: member2;
+} object_names;
+
+// same as other structures except they include functions and access specifiers
+class Rect {		// most importantly, this makes a type
+		int w, h; 	// private access
+	public:
+		void set_values (int,int);	// not inline, defined outside
+		int area() {return (w*h);}
+};
+void Rect::set_values(int x, int y) { 	// scope operator ::
+	w = x;
+	h = y;
+}
+int main () {
+	Rect sq;
+	sq.set.values (2,2);
+	cout << "Area: " << sq.area();
+}
+
+// Constructors
+	// what if we called area before set_values? wouldn't work
+	// pass important arguments to initialize only once
+	// they never return values though, only initialize
+class Rect {	
+		int w, h;
+	public:
+		Rect (int,int); 	// constructor
+		int area() {return (w*h);}
+};
+
+// now in main () we pass those when objs of class created
+Rect r1 (1,3);
+Rect r2 (20,6);
+
