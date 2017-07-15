@@ -690,3 +690,24 @@ class Rect {
 Rect r1 (1,3);
 Rect r2 (20,6);
 
+// overloaded constructors
+Rect::Rect () { 	// default constructor, no params
+	w = 5;
+	h = 5;
+}
+Rect::Rect (int x) {
+	w = x;
+	h = x;
+}
+Rect::Rect (int x, int y) {
+	w = x;
+	h = y;
+}
+
+// Uniform initialization
+Rect r_assignment = 1; 		// variable initialization syntax (ONLY constructors of single param)
+Rect r_functional (1,2);	// functional form
+Rect r_default;				// use default constructor
+Rect r_uniform {1,2}; 		// newer uniform init
+	// functional as most common
+	// uniform has potential pitfalls of using initializer_list
