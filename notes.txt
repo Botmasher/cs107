@@ -513,8 +513,8 @@ typedef struct {
 } stack; 		// now all 3 fields are exposed (explicitly public)
 // expected now: do NOT manipulate the 12 bytes in struct, just use functions to interact
 void StackNew(stack *s);
-void StackDispose(stack *s);
-void StackPush(stack *s, int value);
+void StackDispose(stack *s); 			// make like nothing there
+void StackPush(stack *s, int value); 	// increase its depth
 int StackPop(stack *s);
 
 stack s; 		// we know it's a big box with 3 fields stacked on top of each other
@@ -544,3 +544,162 @@ void StackNew(stack *s) {
 		// BUT don't want asserts to customer because it makes it clear your code failed
 }
 
+
+
+LECTURE 6
+
+- in C stuff is implicitly public, have to write stuff to pretend struct stuff invis!
+
+void StackNew(stack *s)
+{
+	s->loglength=0;
+	s->alloclength=4;
+	s->elems=malloc(4*sizeof(int));
+	assert(s->elems!=NULL);
+}
+
+void StackDispose(stack *s)
+{
+	// opposite of malloc
+	free(s->elems); 	// donated back to the heap is what "free" means
+	
+	// should I free(s) itself? NO! I never allocated space for stack, only assumed
+	// address identified; do NOT know it's dynamically allocated at all!
+	// BUT if I'm doing strings not ints, need to iterate over each and free up char*!
+}
+
+void StackPush(stack *s, int value)
+{
+	// reallocation part (doubling strategy popular: just once every power of 2)
+	// deals with scenarios where actually out of space!
+	if(s->loglength==s->alloclength) {
+		// value has no home because pressing on an extra int onto our stack
+		// client does NOT need to know about this temporary emergency
+
+		// reallocate the array
+			// C++: a bigger array and manual copy, then delete the old mem
+			// C: don't call malloc and do that; call value previously handed back
+			// to you by malloc and resize it!
+		s->alloclength*=2;
+		s->elems=realloc(s->elems, s->alloclength*sizeof(int)); 
+		// tries take pointer passed in, resize in place without replicating mem
+			// if so, just take the next blocks after that
+		// second param takes care of all details to make block that big
+		// if space is in use, calls malloc somewhere else for you
+			// whatever bit pattern, replic bit pattern, frees orig, returns new addr
+		// if you don't pass in first just malloc finds some mem for you
+
+		// macro: some condition in order to move forward if reallocating passes
+		assert(s->elems!=NULL);
+	}
+
+	s->elems[s->loglength]=value; 	// if stack is empty, loglength is 0
+	s->loglength++;					// stack depth and next call insertion index
+}
+
+void StackPop(stack *s)
+{
+	assert(s->loglength>0);
+	s->loglength--;
+	return s->elems[s->loglength];
+}
+
+/* Stack for char* or strings instead
+ * 	dealing with generics instead of ints
+ */
+stack.h
+
+typedef struct {
+	void *elems; 		// lost ability to do pointer arithmetic
+	int elemSize;
+	int loglength; 		// still have how many mystery elems I have
+	int alloclength; 	// how many bytes to alloc for initial stack
+
+}
+
+void StackNew(stack *s, int elemSize);
+void StackDispose(stack *s); 				// mostly the same as for int
+void StackPush (stack *s, void *elemAddr); 	// can't commit to spec pointer type
+	// just have to trust the addr be pointing to s->elemSize figure
+void StackPop (stack *s, void *elemAddr); 	// where client elem should be laid down
+
+void StackNew(stack *s, int elemSize)
+{
+	assert(s->elemSize>0); 		// avoid e.g. someone doing work to allocate -40 bytes
+	s->loglength=0;
+	s->alloclength=4;
+	s->elemSize=elemSize;
+	s->elems=malloc(4*elemSize); 	// can't use size because no type known
+	assert(s->elems!=NULL); 		// don't continue if elements null
+	// all info we need to compute boundaries between elements now
+}
+
+void StackDispose(stack *s)
+{
+	free(s->elems);
+		// not concerned that info inside the blob might be complicated
+}
+
+void StackPush(stack *s, void *elemAddr)
+{
+	// simplified implementation by writing helper function
+	if (s->loglength==s->alloclength)
+		StackGrow(s);
+	void* target = (char*)s->elems + s->loglenth * s->elemSize;
+		// it's typed to be void* so cast as char* for pointer arithmetic
+		// 
+	memcpy(target,elemAddr,s->elemSize); 	// copy whatever's at elemAddr that many bytes
+
+}
+
+// static decorating function (NOT method) is not accessible outside this file
+ 	// technically "internal linkage" .o files to see what's not exported
+ 	// whereas StackPush etc are global and accessible to call from other .o files
+ 	// NOT a waste of time, because each of many files linked together can have
+ 	// so many of the same functions, such as a "swap" function
+static void StackGrow(stack *s)
+{
+	s->alloclength*=2;
+	s->elems=realloc(s->elems, s->alloclenght*s->elemSize);
+	// this is so we can focus on the StackPush actions above and not this stuff
+}
+
+// most interesting and different from int implementation
+void StackPop(stack *s, void* elemAddr)
+{
+	void *source = (char*)s->elems + (s->loglength-1) * s->elemSize;
+		// drawing bit pattern from big blob behind the scenes
+	// so we can replicate into elemaddress
+	memcpy(elemAddr,source,s->elemSize);
+	s->loglength--;
+
+	// as long as everything is consistent, laid down right number of bytes to get back
+	// what we want
+	// I'm not changing elemAddr
+}
+
+int top;
+stack s;
+StackNew(&s, sizeof(int)); 
+	// if I know I have sixteen elements, I want to pop off top element
+StackPop(&s, &top); 	// have to pass in address of some integer
+	// has elemAddr that points to stack
+
+// unit tests to make sure behaving as think
+	// as client, might loop over ints 1 through 1 million
+	// might set alloc length to be 1 instead of 4
+	// pop everything off until empty to make sure descending 1 mill down to 1
+	// if fails, problem; if succeeds, evidence it's close
+// risks: the memcpy and the minusminus are risky
+
+- Generics in C and manual casts
+	- be that much more expert to make sure don't make mistakes
+	- most write program, compile then go thru all kinds of errors
+	- even if doesn't run right, it rarely crashes
+	- C++ is more strongly typed than C because compilation templates typecheck
+		- so first stab at C possible it works as expected
+		- easy to get it to compile
+	- BUT it's hard to get this right every time you program in C
+		- e.g. he forgets s->elemSize in realloc bc it's unnatural to think raw bytes
+		- but if you're dealing with wrong things, ints, will compile but wrong size
+	- if crashes, not compiler, it's your code
