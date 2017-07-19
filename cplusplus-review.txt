@@ -711,3 +711,39 @@ Rect r_default;				// use default constructor
 Rect r_uniform {1,2}; 		// newer uniform init
 	// functional as most common
 	// uniform has potential pitfalls of using initializer_list
+
+// Members initialized in constructors
+class Rect {
+		int w,h;
+	public:
+		Rect(int,int);
+		int area() {return(w*h);}
+}
+// usual definition of constructor
+Rect::Rect (int x, int y) { w=x; h=y; };
+// member initialization
+Rect::Rect (int x, int y) : w(x) { h=y; }
+// or even do nothing but initialize members
+Rect::Rect (int x, int y) : w(x), h(y) {}
+
+// this works for fundamental types after colon; class members just init as default constructor
+	// may or may not be convenient
+	// if default constr not possible, members init in member init list
+
+// pointer to class
+Rect *rp;
+
+// pointed-to class members accessed using arrow op
+rp->area();
+
+// pointer ops with objects and members
+*x; 		// pointed to by x
+&x; 		// address of x
+x.y; 		// member y of object x
+x->y; 		// member y of object pointed to by x
+(*x).y; 	// member y of object pointed to by x
+x[n]; 		// nth obj pointed to by x
+
+// struct also used for classes
+ 	// ONLY diff as that class members private by default, struct public
+ 	// union also public, but behave diff as noted above

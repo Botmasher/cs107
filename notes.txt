@@ -626,11 +626,12 @@ void StackPop (stack *s, void *elemAddr); 	// where client elem should be laid d
 void StackNew(stack *s, int elemSize)
 {
 	assert(s->elemSize>0); 		// avoid e.g. someone doing work to allocate -40 bytes
-	s->loglength=0;
-	s->alloclength=4;
+	s->loglength=0; 			// counter (implicit boundary btwn mem used and not used)
+	s->alloclength=4; 			// length of the array
 	s->elemSize=elemSize;
 	s->elems=malloc(4*elemSize); 	// can't use size because no type known
 	assert(s->elems!=NULL); 		// don't continue if elements null
+	????? 	// secret var not yet given!
 	// all info we need to compute boundaries between elements now
 }
 
@@ -660,7 +661,9 @@ void StackPush(stack *s, void *elemAddr)
 static void StackGrow(stack *s)
 {
 	s->alloclength*=2;
-	s->elems=realloc(s->elems, s->alloclenght*s->elemSize);
+	s->elems=realloc(s->elems, s->alloclength*s->elemSize); 	// addr to reallc, how big for it to be
+		// make it twice as big (already done) and mult by how big each elem is (REMEMBER TO DO THIS!)'
+		// as above, realloc checks mem avail right next to current alloc otherwise cpy new and free old
 	// this is so we can focus on the StackPush actions above and not this stuff
 }
 
