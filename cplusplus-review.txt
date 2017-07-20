@@ -747,3 +747,53 @@ x[n]; 		// nth obj pointed to by x
 // struct also used for classes
  	// ONLY diff as that class members private by default, struct public
  	// union also public, but behave diff as noted above
+
+// overloadable class operators
+struct product {
+	string name;
+	float price;
+} a, b, c;
+a=b+c; 	// will just not compile bc + behavior not defined for these types
+
+// use operator functions to overload them
+type operator sign (parameters) { /* body */ }
+class CartesianVector {
+	public:
+		int x,y;
+		CartesianVector() {};
+		CartesianVector(int a, int b) : x(a), y(b) {}
+		CartesianVector operator + (const CartesianVector&); 	// constructor function returns CVector
+			// operator+ here overloads op to take type as rhs operand
+};
+
+// overload as non-member func instead (above was as member function)
+	// only some operators; pass object of proper class as first arg
+CartesianVector operator+ (const CartesianVector& lhs, const CartesianVector& rhs)
+{
+	CartesianVector temp;
+	temp.x = lhs.x + rhs.x;
+	temp.y = lhs.y + rhs.y;
+	return temp;
+}
+	// now when add two CVects you get a new vector with result (x,y) added properly
+
+// "this" keyword
+	// within function pointer to object whose member func is being executed
+class Itself {
+	public:
+		bool itsme (Itself&);
+}
+bool Itself::itsme (Itself& x)
+{
+	if (&x==this) return true;
+	return false;
+}
+
+// this used within operator= def
+CartesianVector& CartesianVector::operator= (const CartesianVector& param)
+{
+	// similar to what compiler generates implicitly for operator= for this class!
+	x=param.x; 		// me: equiv to this.x and this.y?
+	y=param.y;
+	return *this;
+}
