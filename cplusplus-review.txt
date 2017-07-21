@@ -797,3 +797,19 @@ CartesianVector& CartesianVector::operator= (const CartesianVector& param)
 	y=param.y;
 	return *this;
 }
+
+// static data or functions
+class Something {
+	public:
+		static int n;
+		Something () { n++; }
+}
+int Something::n=0; 	// same props as non-members but have class scope
+// must be init outside class, not inside it (to avoid multiple decl)
+// can be ref by any obj of that class
+Something a;
+Something b[2];
+cout << a.n;
+
+// can also be ref through class name directly
+cout << Something::n;
