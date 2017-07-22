@@ -813,3 +813,31 @@ cout << a.n;
 
 // can also be ref through class name directly
 cout << Something::n;
+
+// constant obj
+const Something sth;
+// constant member funcs - access is read-only, though constructor still mods
+// member funcs only called if spec as const members
+int const get() { return x; }
+	// sth.get() would not be callable if not specified as const
+// /!\ keep syntax different from const return type!
+const int& get () { return x; }
+
+// /!\ const member funcs CANNOT modify non-static data or call non-const funcs
+
+// NOT uncommon or unwieldy; most funcs taking objects actually take const objs!
+	// so can call const member functions without modifying data of obj
+
+// can overload a func, one const one not
+class AnotherThing {
+		int x;
+	public:
+		AnotherThing(int val) : x(val) {}
+		const int& get () const { return x; }
+		int& get () { return x; }
+}
+// then in main()
+AnotherThing th1 (2);
+AnotherThing th2 (10);
+th1.get() = 10; 	// valid because returns int&
+th2.get() = 2; 		// invalid because returns const int&
