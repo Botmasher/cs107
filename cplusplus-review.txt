@@ -841,3 +841,42 @@ AnotherThing th1 (2);
 AnotherThing th2 (10);
 th1.get() = 10; 	// valid because returns int&
 th2.get() = 2; 		// invalid because returns const int&
+
+// class templates
+template <class T>
+class mypair {
+		T values [2];
+	public:
+		mypair (T first, T second) {
+			values[0]= first; values[1]=second;
+		}
+};
+// above stores values of any valid type
+mypair<int> myobj (100, 2); 		// or mypair<double> myobj (100.1, 2.7589);
+
+// member func declared outside (not inline like constructor above)
+template <class T> 			// <class T> for class template parameter
+T mypair<T>::getmax () 		// T for return type, <T> for func templ param
+{
+	T maxval;
+	maxval = a>b? a : b;
+	return maxval;
+}
+
+// template specialization for when spec type passed into template
+template <class T>				// generic template
+class myclasstemplate {
+		T element;
+	public:
+		myclasstemplate (T arg) { element=arg; }
+		T increase () { return ++element; }
+};
+template <> 					// specialization; empty param list since all types known
+class myclasstemplate <char> {
+		char element;
+	public:
+		myclasstemplate (char arg) { element=arg; }
+		char uppercase() {
+			...
+		}
+};
