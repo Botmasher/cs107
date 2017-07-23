@@ -880,3 +880,38 @@ class myclasstemplate <char> {
 			...
 		}
 };
+
+// default constructor
+class Example {
+	public:
+		int val;
+		void accumulate (int x) { total += x; }
+};
+
+Example ex; 	// do not need an explicit constructor for 0 params
+	// BUT once explicit constructor declared, replaces default constructor
+	// so the compiler does not supply one automatically (one that takes 0 args)
+
+// default constructor essentially looks like this
+Example () {}
+
+// Destructor for cleanup when class lifetime ends
+	// used e.g. to release memory from dynamic memory alloc
+class Example {
+		string* p;
+	public:
+		// CONSTRUCTOR functions allocate dynamic memory to store string
+		Example() : p(new string) {}
+		Example (const string& s) : p(new string(str)) {}
+		// DESTRUCTOR function
+		~Example () { delete p; }
+		const string& content() const { return *p; }
+}
+
+int main () {
+	Example ex0;
+	Example ex1 ("example");
+
+	std.cout << "ex1 content: " << ex1.content() << '\n';
+	return 0;
+}
