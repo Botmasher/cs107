@@ -915,3 +915,54 @@ int main () {
 	std.cout << "ex1 content: " << ex1.content() << '\n';
 	return 0;
 }
+
+// copy constructor
+	// invoked when passing name of own-type obj to an obj as arg
+MyClass::MyClass (const MyClass&);
+
+// implicit copy just performs copy of all members
+class MyClass {
+	public:
+		int a, b; string c;
+};
+
+// shallow copy is about equivalent to this syntax
+MyClass::MyClass(const MyClass& x) : a(x.a), b(x.b), c(x.c) {}
+
+// shallow copy may not be appropriate when dealing with pointers
+	// mult obj will have members still pointing to e.g. same string
+	// following custom copy constructor does deep copy
+class Example {
+		string *p;
+	public:
+		// constructor
+		Example (const string& s) : p(new string(s)) {};
+		// destructor
+		~Example () { delete p; }
+		// custom deep copy of the string's contents
+		Example (const Example& x) : p(new string(x.content())) {} 	// alloc storage for new string
+		// access the content of the string
+		const string& content() const { return *p; }
+};
+
+// copy assignment - can copy obj on any assignment (not just during init or construction)
+MyClass c0;
+MyClass c1 (c0); 		// call copy constructor
+MyClass c2 = c1; 		// call copy constructor; NOT assignment (just another syntax for 1-arg constructor)
+c0 = c1; 				// copy assignment called since obj already init
+	// copy assignment operator = is an overload of equals sign:
+	// takes value of class as param, roughly returns *this
+MyClass& operator= (const MyClass&); 	// defined implicitly this way if no copy or move constructor def
+	// AGAIN, this is SHALLOW copy
+
+// writing a deep copy version of the copy assignment operator
+Example& operator= (const Example& x) {
+	delete p; 						// delete currently pointed string
+	p = new string (x.content()); 	// alloc space for string and copy it
+	return *this;
+}
+// better yet, reutilize string since string not constant
+Example& operator= (const Example& x) {
+	*p = x.content();
+	return *this;
+}
