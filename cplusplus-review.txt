@@ -966,3 +966,49 @@ Example& operator= (const Example& x) {
 	*p = x.content();
 	return *this;
 }
+
+// move constructor and assignment - transfer content from src obj to dest obj
+	// only happens when the src of the value is an unnamed object
+	// examples of "unnamed temporaries": return vals of functions, type-casts
+	// since not used for anything else, copy not required
+// move constructor on unnamed temporary
+MyClass fn(); 			// func returning MyClass obj
+MyClass c0;	 			// default constructor
+MyClass c1 = c0; 		// copy constructor
+MyClass c2 = fn(); 		// move constructor
+c0 = c1;				// copy assignment
+c2 = MyClass(); 		// move assignment
+
+// move constructor and assignment members take param "rvalue reference to the class itself"
+MyClass (MyClass&&); 				// move constructor
+MyClass& operator= (MyClass&&);		// move assignment
+	// rvalue reference is specified c 2 ampersands
+	// val&& matches temporaries or references of this type
+
+// copying vs moving very useful for objects that allocate and delete storage
+	// COPY: alloc mem to B and copy entire content of A to newly alloc B mem
+	// MOVE: transfer mem already allocated to A over to B without alloc new storage
+			// MOVE is thus simply copy of pointer
+class Example {
+		string* p;
+	public:
+		Example (const string& s) : p (new string(s)) {}
+		~Example () { delete p; }
+		// move constructor
+		Example (Example&& x) : p (x.p) { x.p=nullptr; }
+		// move assignment
+		Example& operator= (Example&& x) {
+			delete p;
+			p = x.p;
+			x.p = nullptr;
+			return *this;
+		}
+		// access string content
+		const string& content() const { return *p; }
+		// addition
+		Example operator+ (const Example& rhs) {
+			return Example(content()+rhs.content());
+		}
+};
+	// /!\ rvalue params possible for any func param, most often just used for move constr
+	// source of errors difficult to track if used without care /!\
