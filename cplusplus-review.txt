@@ -1012,3 +1012,39 @@ class Example {
 };
 	// /!\ rvalue params possible for any func param, most often just used for move constr
 	// source of errors difficult to track if used without care /!\
+
+// Implicit members declared in specific circumstances
+/*
+ * 	Default constructor 	if no other constructors
+ *  Default destructor 		if no other destructors
+ * 	Copy constructor 		if no move constructor or move assignment
+ * 	Copy assignment 		if no move constructor or move assignment
+ * 	Move constructor  		if no destructor, copy constructor nor copy/move assignment
+ * 	Move assignment 		if no destructor, copy constructor nor copy/move assignment
+ */
+ // class CAN select which implicit members are included or deleted using "default" and "delete"
+class Rect {
+ 	 	int w,h;
+ 	public:
+ 		// Rect can be constructed with two arguments
+ 		Rect (int x, int y) : w(x), h(y) {}
+ 		// Rect can be implicitly "default-constructed" with no arguments
+ 		Rect () = default;
+ 		// Rect cannot be implicitly "copy-constructed" by passing Rect& obj to Rect class
+ 		Rect (const Rect& other) = delete;
+ 		int area() { return w*h; }
+};
+
+// now IMPLICIT copy construction is no longer valid
+Rect r0;
+Rect r1 (3,2);
+Rect r1 (r0); 	// INVALID because copy constructor set to delete
+
+// HOWEVER you could still explicitly define a copy constructor
+Rect::Rect (const Rect& other) : w(other.w), h(other.h) {}
+
+// Terminology: "=default" NOT equal to the default constructor (invoked with no args)
+	// BUT equal to constructor that's implicitly def when not deleted
+
+// Best practice: classes that define one copy/move constr or one copy/move assign (NOT both)
+	// should specify "default" OR "delete" on other special member funcs they don't assign
