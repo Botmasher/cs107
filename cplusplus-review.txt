@@ -1091,3 +1091,63 @@ void Rect::convert (Square sq) {
 }
 	// friends are NOT reciprocal: friended is not auto friend back
 	// friends are NOT transitive: friend of friend is not auto friend
+
+// inheritance between classes
+class Polygon {
+	protected: 					// accessible from derived classes instead of private
+		int w,h;
+	public:
+		void set_vals (int a, int b)
+		{ w=a; h=b; }
+};
+class Rect: public Polygon { 	// inherit from base class
+	public:
+		int area () { return w*h; }	
+};
+
+// 	access 						public	protected 	private
+// 	members of same class 		T 		T 			T
+//	members of derived class 	T 		T 			F
+// 	non-members(*) 				T 		F 			F
+// 	(*) incl main(), another class, another function
+
+// take another look at inheritance from base class access level
+class DerivedClass : public BaseClass {}; 		// "public" declares MAX access level
+	// if PROTECTED, all PUBLIC members would be PROTECTED and PRIVATE would remain PRIVATE
+	// if PRIVATE, all PUBLIC and PROTECTED and PRIVATE members would be PRIVATE
+// /!\ this doesn't restrict derived class from setting own access levels on its members
+// /!\ best practice usu set public and set access levels on base class members not during inheritance
+
+// what is NOT inherited
+	// - private members of base class
+	// - friends of base class
+	// - assignment operator= members of base class
+	// - constructors and destructor of base class (*)
+// (*) however these are called DIRECTLY by derived class
+
+// derived class automatically calls default constructor of base class (and not its own default)
+// call a different constructor of the base class instead of the default
+derived_constructor_name (params) : base_constructor_name (params) { ... }
+
+class Mother {
+	public:
+		Mother () { cout << "Mother: no params\n"; }
+		Mother (int a) { cout << "Mother: int param\n"; }
+};
+class Daughter {
+	public:
+		Daughter (int a) 					// calls default constructor on Mother
+		{ cout << "Daughter: int param\n"; }
+};
+class Son {
+	public:
+		Son (int a) : Mother (a) 			// calls 1 int param constructor on Mother
+		{ cout << "Son: int param\n"; }
+};
+// you'll get the first message from Mother followed by the one from Daughter in main ()
+Daughter je(0);
+// you'll get the second message from Mother followed by the one from Son in main ()
+Son jo(0);
+
+// multiple inheritance - all members from mult classes (c "what is NOT inherited" restrictions above)
+class Rect : public Polygon, public Output;
