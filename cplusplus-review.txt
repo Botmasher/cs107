@@ -1048,3 +1048,46 @@ Rect::Rect (const Rect& other) : w(other.w), h(other.h) {}
 
 // Best practice: classes that define one copy/move constr or one copy/move assign (NOT both)
 	// should specify "default" OR "delete" on other special member funcs they don't assign
+
+/*
+ * 	Friendship and inheritance
+ */
+// non-member friend can access private and protected members of a class
+	// func must be declared friend within class
+class Rect {
+	...
+	friend Rect duplicate (const Rect&);
+};
+Rect duplicate (const Rect& param)
+{
+	Rect r;
+	r.w = param.w*2;
+	r.h = param.h*2;
+	return r;	
+}
+int main () {
+	Rect rectangle;
+	Rect square (2,2);
+	rectangle = duplicate (square); 	// accesses private w and h
+}
+// friend functions typically used to access private/protected members between 2+ classes
+
+// friend classes - similarly have access to private/protected members of another class
+class Square; 		// need empty declaration of class because referenced in Rect!
+class Rect {
+	... 
+	void convert (Square);
+};
+class Square {
+	friend class Rect;
+	private:
+		int side;
+	public:
+		Square (int a) : side(a) {}
+};
+void Rect::convert (Square sq) {
+	w = sq.side; 	// friend Rect can access private Square::side
+	h = sq.side;
+}
+	// friends are NOT reciprocal: friended is not auto friend back
+	// friends are NOT transitive: friend of friend is not auto friend
