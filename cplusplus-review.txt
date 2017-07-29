@@ -1151,3 +1151,50 @@ Son jo(0);
 
 // multiple inheritance - all members from mult classes (c "what is NOT inherited" restrictions above)
 class Rect : public Polygon, public Output;
+
+
+/*
+ * 	Polymorphism
+ */
+// pointer to derived class is type-compatible c pointer to base
+class Polygon {
+	...
+};
+class Rect: public Polygon {
+	...
+	int area () {
+		...
+	}
+};
+class Triangle: public Polygon {
+	...
+	int area () {
+		...
+	}
+};
+int main () {
+	Rect r;
+	Triangle t;
+	// pointer to derived classes of type parent class
+	Polygon * poly1 = &r;
+	Polygon * poly2 = &t;
+	poly1->set_values(2,2); 		// can call method from derived class
+}
+
+// equivalent results from these statements (incl deref)
+(*poly1).set_values(2,2);
+poly1->set_values(2,2);
+r.set_values(2,2);
+	// pointer to that type can only access members on that type
+	// so poly1 can't access e.g. an area() function defined on Rect
+
+// virtual allows redefining method in a derived class
+	// which is one way to skirt poly1's area() problem mentioned above
+class Polygon {
+	...
+	virtual int area () 
+	{ return 0; }
+};
+// had this been base class instead could've called area on poly1
+poly1->area(); 		// this is now a "Polymorphic class"
+// base Polygon (declares virtual) and the derived Rect (inherits virtual) are "Polymorphic classes"
