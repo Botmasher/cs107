@@ -1198,3 +1198,87 @@ class Polygon {
 // had this been base class instead could've called area on poly1
 poly1->area(); 		// this is now a "Polymorphic class"
 // base Polygon (declares virtual) and the derived Rect (inherits virtual) are "Polymorphic classes"
+
+// abstract class
+class Polygon {
+	protected:
+	 	int w, h;
+	public:
+		void set_values (int a, int b) {
+			w = a; h = b;
+		}
+		virtual int area () =0; 	// PURE virtual function that has NO definition
+};
+ 	// such class is an "abstract base class" and cannot instantiate obj
+// still create pointers to it and 
+Polygon * ppoly1;
+// still use polymorphism and dereferencing
+int main () {
+	Rectangle rect;
+	Triangle trngl;
+	Polygon * polyptr1 = &rect;
+	Polygon *polyptr2 = &trngl;
+	polyptr1->set_values(2,2);
+	cout << polyptr1->area();
+}
+
+// abstract base class implementation using "this" c virtual so pointer can call proper function on derived classes
+	// even though no function implemented on base!
+class Polygon {
+	protected:
+		int w, h;
+	public:
+		void set_values (int a, int b) { w=a; h=b; }
+		virtual int area () =0;
+		void print_area() {
+			cout << this->area() << '\n'; 	// note the keyword "this"
+		}	
+};
+class Triangle : public Polygon {
+ 	... 	// area function	
+};
+class Rectangle : public Polygon {
+	...	 	// area function
+};
+int main () {
+	Rect r;
+	Triangle t;
+	Polygon * p1 = &r;
+	Polygon * p2 = &t;
+	p1->set_values(2,2);
+	p2->set_values(3,10);
+	p1->print_area(); 	 	// will print result of Rect's area()
+	p2->print_area(); 	 	// will print result of a Triangles's area()
+}
+
+// can of course combine with constructor initializers and dynamic memory
+class Polygon {
+	protected:
+		int w, h;
+	public:
+		Polygon (int a, int b) : w(a), h(b) {}
+		void set_values (int a, int b) { w=a; h=b; }
+		virtual int area () =0; 			// pure virtual func; an abstract base class
+		void print_area() {
+			cout << this->area() << '\n'; 	// note keyword "this" for derived class
+		}	
+};
+class Triangle : public Polygon {
+	public:
+		Triangle (int a, int b) : Polygon (a,b) {}
+ 		int area () { return (0.5 * w * h); }
+};
+class Rect: public Polygon {
+	public:
+		Rect (int a, int b) : Polygon (a,b) {}
+		int area () { return (w * h); }
+};
+int main () {
+	Polygon * p1 = new Rect (2,2); 		// dyn "new" Rect but pointer to Polygon ptr type
+	Polygon * p2 = new Triangle (7,4); 	// dyn "new" Triangle but pointer to Polygon ptr type
+	p1->print_area(); 	 				// print result of Rect's area()
+	p2->print_area(); 	 				// print result of a Triangles's area()
+	delete p1;
+	delete p2;
+	return 0;
+}
