@@ -1282,3 +1282,44 @@ int main () {
 	delete p2;
 	return 0;
 }
+
+
+/*
+ * 	Type conversions
+ */
+
+// implicit when value copied to compatible type
+short a = 1000;
+int b = a; 		// "standard conversion" btwn fundamental numerical types and bool, some ptrs
+	// "promotion" to int from smaller type, or double from float
+	// other conversions not necessarily represent the same value accurately
+		// - neg to unsigned becomes 2's complement: -1 largest, -2 second largest
+		// - bool have false equal to zero or nullptr, everything else to 1
+		// - float-like to integer-like drops decimals; "undefined behavior" if not representable
+		// - "implementation specific" btwn same num types (floating to floating, integer to integer), valid
+	// pointer conversions
+		// - null ptr to ptr of any type
+		// - ptr of any type to void pointer
+		// - "pointer upcast": derived class to "accessible" and "unambiguous" base class (w/o mod its const/volatile)
+
+// implicit with classes - 3 types
+class A {};
+class B {
+	public:
+		// single-argument constructor conversion
+		B (const A& x) {}
+		
+		// assignment conversion
+		B& operator= (const A& x) { return *this; }
+		
+		// type-cast operator conversion
+		operator A() { return A(); } 	// special syntax: destination type and empty parens
+										// return type is dest type so not specified
+};
+int main () {
+	A a;
+	B b = a; 		// call constructor
+	b = a; 			// call assignment
+	a = b;			// call type-cast operator
+	return 0;
+}
