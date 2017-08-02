@@ -1323,3 +1323,64 @@ int main () {
 	a = b;			// call type-cast operator
 	return 0;
 }
+
+// "explicit" keyword
+	// added to class B above
+	void func (B arg) {}
+		// could be called by arg of type A!
+		// e.g. func (a);
+// prevent by marking with "explicit"
+class B {
+	public:
+		explicit B (const A& x) {} 		// constructor marked explicit
+		B& operator= (const A& x) {
+			return *this;
+		}
+		operator A() { return A(); }
+};
+void func (B x) {}
+// now can't call that constr from obj of type A
+int main () {
+	A a;
+	B b (a);
+	b = a;
+	a = b;
+	func (a); 	// CANNOT call since B's constructor marked explicit
+	func (b); 	// can call
+}
+// "explicit" class behavior
+	// - can no longer use equals syntax to construct B
+	// 		e.g.	B b = a; 	no longer works
+	// - constructors without explicit are "converting constructors"
+	// - type-cast member functions can also be explicit (operator + type syntax)
+		// e.g. 	explicit operator bool() { return true; }
+		// OK if class::operator bool(), ERROR if copy initialization considers class::operator bool()
+
+// explicit type casting
+double x = 10.5;
+int y;
+y = int (x); 	// functional notation
+y = (int) x; 	// c-like cast notation
+// watch out for indiscriminate class and pointer-to-class casting - compiles but runtime errors
+class X {
+	double i,j;
+};
+class Sum {
+		int x,y;
+	public:
+		Sum (int a, int b) { x=a; y=b; }
+		int result() { return x+y; }
+};
+int main () {
+	X x;
+	Sum * psum; 				// declares pointer
+	psum = (Sum*) &x; 			// but assigns to cast of pointer of unrelated type!
+	cout << psum->result(); 	// since can convert any ptr to any other ptr type, runtime error or unexpected
+	return 0;
+}
+
+// "specific casting operators" instead to restrict type casting
+dynamic_cast <new_type> (expression_to_cast); 		// dynamic casts
+static_cast <new_type> (expression_to_cast); 		// static casts
+reinterpret_cast <new_type> (expression_to_cast); 	// reinterpret casts
+const_cast <new_type> (expression_to_cast); 		// const casts
