@@ -1195,7 +1195,7 @@ class Polygon {
 	virtual int area () 
 	{ return 0; }
 };
-// had this been base class instead could've called area on poly1
+// had this been base class instead could've called area on Rect poly1
 poly1->area(); 		// this is now a "Polymorphic class"
 // base Polygon (declares virtual) and the derived Rect (inherits virtual) are "Polymorphic classes"
 
@@ -1384,3 +1384,39 @@ dynamic_cast <new_type> (expression_to_cast); 		// dynamic casts
 static_cast <new_type> (expression_to_cast); 		// static casts
 reinterpret_cast <new_type> (expression_to_cast); 	// reinterpret casts
 const_cast <new_type> (expression_to_cast); 		// const casts
+
+// dynamic cast - convert if result is valid ptr to obj of destination type
+	// - only c ptrs and references to classes or void*
+	// - can upcast (from ptr to derived clas to ptr base class)
+	// - can also downcast polymorphic classes (inherits virtual)
+	// - can cast null ptrs btwn pointer types (incl unrelated classes)!
+	// - can cast any ptr type to a void*
+class Base { virtual void dummy() {} };
+class Derived: public Base { int a; };
+int main () {
+	try {
+		Base * p0 = new Derived; 			// p0 points to obj of type Derived
+		Base * p1 = new Base; 				// p1 points to obj of type Base
+		Derived * p2; 						// holder to try and assign type-cast obj
+		p2 = dynamic_cast<Derived*>(p0); 	// p0 points to full object of type Derived
+		if (p2==0) cout << "Null ptr on first cast.\n"; 	// won't pass
+		p2 = dynamic_cast<Derived*>(p1);	// p1 points to incomplete object of class Derived (it's Base)
+		if (p2==0) cout << "Null ptr on second cast.\n"; 	// will pass and output mssg
+	} catch (exception e) { cout << "Exception: " << e.what(); }
+	return 0;
+}
+
+// static cast - convert btwn ptrs to related classes (upcasts and downcasts)
+	// - does not check that objects are full objects of the type unlike dynamic
+	// - however does not have runtime type-safety check overhead that dynamic has
+	// - can convert from void* to any ptr type
+	// 		- guarantees that if value obtained by converting from same ptr type, resulting value is same
+	// - can convert integers, floating-point and enums to enums
+	// - can explicitly call single-arg constructors
+	// - can explicitly call conversion operators
+	// - can convert enum to integers or floating point
+	// - can convert any type to void (discards value)
+class Base {};
+class Derived: public Base {};
+Base * a = new Base;
+Derived * b = static_cast<Derived*>(a); 	// valid code BUT incomplete obj so runtime errors if deref
