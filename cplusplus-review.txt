@@ -932,6 +932,7 @@ MyClass::MyClass(const MyClass& x) : a(x.a), b(x.b), c(x.c) {}
 // shallow copy may not be appropriate when dealing with pointers
 	// mult obj will have members still pointing to e.g. same string
 	// following custom copy constructor does deep copy
+// "custom copy constructor"
 class Example {
 		string *p;
 	public:
@@ -1357,6 +1358,7 @@ int main () {
 		// OK if class::operator bool(), ERROR if copy initialization considers class::operator bool()
 
 // explicit type casting
+	// func calls - C++ allows one implicit conversion per arg
 double x = 10.5;
 int y;
 y = int (x); 	// functional notation
@@ -1414,9 +1416,59 @@ int main () {
 	// - can convert integers, floating-point and enums to enums
 	// - can explicitly call single-arg constructors
 	// - can explicitly call conversion operators
+	// - can convert to rvalue reference (reference to the MyClass&& itself - see move constr & assgn above)
 	// - can convert enum to integers or floating point
 	// - can convert any type to void (discards value)
 class Base {};
 class Derived: public Base {};
 Base * a = new Base;
 Derived * b = static_cast<Derived*>(a); 	// valid code BUT incomplete obj so runtime errors if deref
+
+
+// reinterpret cast - any pointer type to any other pointer type
+	// - simple binary copy of val from one ptr to other
+	// - neither content nor ptr is checked
+	// - can cast ptr to/from integer (only guaranteed to work back if integer type large enough to contain it)
+	// - works diff from static cast, resulting in non-portable reinterp of binary representations of types
+		// - these reinterpretations as "low-level operations"
+class A { ... };
+class B { ... };
+A * a = new A;
+B * b = reinterpret_cast<B*>(a); 	// works but points to diff, maybe uncompatible, class - deref B is unsafe
+
+// const cast - sets or removes the constness of the pointed object
+void print (char * str) { 		// works bc fn does not attempt to write to pointed object
+	cout << str << '\n'; 			// /!\ if it did try it would result in "undefined behavior" /!\
+}
+int main () {
+	const char* c = "some text";
+	print ( const_cast<char*> (c) ); 	// pass const ptr to a fn that expects a non-const arg
+	return 0;
+}
+
+// typeid - type checking
+	// - returns ref to const obj of the type type_info (defined in standard header <typeinfo>)
+	// - can be compared to any other typeid using == or !=
+	// - can use name() to obtain char sequence representing the type/class name (null-terminated \0)
+		// - output of name() definitely depends on your compiler, and isn't necessarily simple name
+typeid (expression)
+if (typeid(a)==typeid(b)) { ... }
+
+// typeid applied to classes
+	// - uses RTTI to track type of dynamic objs
+	// - if polymorphic class, result is type of most derived complete obj
+	// - considers pointer type itself when looking at pointers
+	// - BUT considers dynamic type when looking at objects themselves
+	// - bad_typeid exception if checking a dereferenced ptr with a null value (*nullptr)
+class Base { virtual void fn() {} };
+class Derived: public Base {};
+int main () {
+	try {
+		Base* a = new Base;
+		Base* b = new Derived;
+		cout << "b is: " << typeid(b).name() << '\n'; 			// prints that b is "class Base"
+		cout << "b* is: " << typeid(*b).name() << '\n'; 		// prints that b is "class Derived"
+		cout << typeid(a).name() << typeid(a*).name() << '\n'; 	// prints "class Baseclass Base"
+	} catch (exception& e) { cout << "Exception: " << e.what() << '\n'; }
+	return 0;
+}
