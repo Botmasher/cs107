@@ -1472,3 +1472,102 @@ int main () {
 	} catch (exception& e) { cout << "Exception: " << e.what() << '\n'; }
 	return 0;
 }
+
+
+/*
+ * 	Exceptions
+ */
+
+// as way to react to exceptional situations
+	// - excpetion "handlers" are special functions
+	// - "try-block" puts code under exception inspection
+	// - exception thrown using "throw" inside try block
+	// - handlers declared c "catch" immediately after try block
+
+#include <iostream>
+using namespace std;
+
+int main () {
+	try {
+		throw 20; 		// accepts 1 param to pass as arg to catch
+	}
+	catch (int e) { 	// checks against type passed by throw - only caught if types match!
+		cout << "Exception Nr. " << e << '\n'; 		// will print 20
+	}
+	return 0;
+}
+
+// catch any type of exception
+try {
+	// try block
+}
+catch (int param) {}
+catch (char param) {}
+catch (...) { cout << "default exception"; } 	// in this case catch any non-int non-char exception
+	// after catch runs, resumes AFTER try-catch, NOT after throw keyword
+
+// nested try-catch to forward exception up to external level - throw c no param
+try {
+	try {
+
+	} catch (int e) {
+		throw;
+	}
+}
+catch (...) {
+	cout << "Exception occured.";
+}
+
+// "dynamic exception specifications" - older code, deprecated but still supported
+double myfunc (char param) throw (int);
+	// - declares function taking one char and returning a double
+	// - if throws exception of type other than int, calls std::unexpected instead of handler or std::terminate
+int myfunc (int param) throw(); 	// call std::unexpected for ANY exception type
+int myfunc (int param); 			// normal exception handling - look for handler
+
+// standard exceptions with <exception> header
+	// - includes virtual member function what()
+	// - what() returns null-terminated char sequence (of type char*)
+	// - what can be overwritten in derived classes to contain desc of exception
+#include <iostream>	
+#include <exception>
+using namespace std;
+class myexception: public exception
+{
+	virtual const char* what() const throw() 	// overwritten what() func
+	{
+		return "Reached my exception!"; 		// overwritten to contain desc of exception
+	}
+} myexception;
+
+int main () {
+	try {
+		throw myexcpetion;
+	} catch (exception& e) { 		// catch exception class by reference, here including our derived myexception
+		cout << e.what() << '\n'; 	// will reach our 
+	}
+	return 0;
+}
+
+// C++ standard library components throw exceptions, all derived from this exception class
+bad_alloc 			// thrown by new on alloc fail
+bad_cast 			// thrown by dynamic_cast on dynamic cast fail
+bad_exception 	 	// thrown by dynamic exception specifiers
+bad_typeid 			// thrown by typeid
+bad_function_call 	// thrown by empty function objects
+bad_weak_ptr 		// thrown by shared_ptr when passed a bad weak_ptr
+
+// header <exception> defines two generic types that can be inherited by custom exceptions
+logic_error
+runtime_error
+
+// standard exceptions typically need to be checked on mem alloc!
+int main () {
+	try {
+		int* myarray = new int[1000];
+	}
+	catch (exception& e) { 					// catchable bad_alloc from base exception (captured by ref exception&)
+		cout << "Standard exception: " << e.what() << endl; 	// will catch bad_alloc bc derived from exception
+	}
+	return 0;
+}
