@@ -1600,3 +1600,94 @@ combo(c,out) << "sometxt"; 	// effectively: 	cout << "sometxt"
 	// - tricky bc macro defs replace BEFORE ANY syntax checks
 	// - tricky bc code becomes less readable if heavy use
 	// - tricky bc syntax in many cases very different from normal C++ expressions
+
+// Conditional Includes
+	// - use or discard line based on condition met
+	// - "ifdef" only if the specified macro is defined
+	// - "ifndef" only if the specified macro is NOT defined
+	// - "if", "elif, "else" evaluate constant expressions
+	// - "endif" to end series of chained expressions
+#ifdef TABLE_SIZE
+int table[TABLE_SIZE];
+#endif
+
+#ifndef TABLE_SIZE
+#define TABLE_SIZE 250
+#endif
+
+#if TABLE_SIZE>250
+#undef TABLE_SIZE
+#define TABLE_SIZE 250
+
+#elif TABLE_SIZE<50
+#undef TABLE_SIZE
+#define TABLE_SIZE 50
+
+#else
+#undef TABLE_SIZE
+#define TABLE_SIZE 250
+#endif
+
+int tbl[TABLE_SIZE];
+
+// use "if" with "defined" and "!defined" to achieve same ifdef/ifndef behavior
+#if defined ARRAY_SIZE
+#define TABLE_SIZE ARRAY_SIZE
+#elif !defined BUFFER_SIZE
+#define TABLE_SIZE 256
+#else
+#define TABLE_SIZE BUFFER_SIZE
+#endif
+
+// Line control - error reporting, assign custom filename and line number
+// 	syntax: #line number "filename"
+#line 20 "assigning variable"
+int a?; 	// code now generates error and gives this location of error: assigning variable", line 20
+
+// #error directive - abort compilation at this line and generate compilation error
+#ifndef __cplusplus
+#error A C++ compiler is required!
+#endif
+	// will abort if macro name __cplusplus is not defined
+
+// #include a source file
+#include <header>
+#include "file"
+	// - header provided by implementation, e.g. library iostream
+	// - header may exist as files or other implementation, that's all "implementation defined"
+	// - file searched for in an "implementation defined" way
+	// - file search generally includes current path
+	// - file not found interpreted (generally) as if quotes were <>, meaning it's a HEADER directive!
+
+// #pragma - specify diverse options to compiler
+	// - specific to your compiler+platform
+	// - if compiler doesn't support an arg, pragma simply ignored
+	// - never generates syntax error
+
+// predefined macro names
+__LINE__		// integer rep current line in compiled source code file
+__FILE__ 		// string literal c presumed name of compiled source code file
+__DATE__		// string literal "Mm dd yyyy" c date on which compilation process began
+__TIME__ 		// string literal "hh:mm:ss" c time at which compilation process began
+__cplusplus 	// integer constant defined by all C++ compilers, depends on version of standard supported
+					// 199711L 	is for ISO C++ 1998/2003
+					// 201103L 	is for ISO C++ 2011
+__STDC_HOSTED__ // 1 if hosted implementation (all standard headers) 0 otherwise
+
+// optionally defined macros
+__STDC__ 		// for C: defined to 1, conforms to C standard
+				// for C++: implementation defined
+__STDC_VERSION__ 			// in C: 199401L, 199901L, 201112L; C++: implementation defined
+__STDC_MB_MIGHT_NEQ_WC__	// 1 if multibyte encoding might give char in char literals diff val
+__STDC_ISO_10646__			// yyyymmL specifying date of Unicode standard followed by encoding of wchar_t chars
+__STDCPP_STRICT_POINTER_SAFETY__	// 1 if implementation has strict pointer safety
+									// (among relaxed/preferred/strict - see get_pointer_safety)
+__STDCPP_THREADS__ 			// 1 if program can have multiple threads
+	// maybe more threads in particular implementations
+#include <iostream>
+int main () {
+	std::cout << "Current line number " << __LINE__;
+	std::cout << " of file " << __FILE__ << " compiled beginning on " << __DATE__;
+	std::cout << " at time " << __TIME__ << ". Compiler __cplusplus value of " << __cplusplus << '\n';
+	return 0;
+}
