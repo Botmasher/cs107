@@ -1544,7 +1544,7 @@ int main () {
 	try {
 		throw myexcpetion;
 	} catch (exception& e) { 		// catch exception class by reference, here including our derived myexception
-		cout << e.what() << '\n'; 	// will reach our 
+		cout << e.what() << '\n'; 	// will reach ours
 	}
 	return 0;
 }
@@ -1571,3 +1571,32 @@ int main () {
 	}
 	return 0;
 }
+
+/*
+ *	Preprocessor directives - lines beginning c #
+ */
+// directive replaces any occurrence of (identifier) with (replacement), which is an expression, block, anything
+#define TABLE_SIZE 250
+int tbl[TABLE_SIZE]; 	// -> effectively equiv: 	int tbl[250]
+
+// parameters to define func macros
+#define getmax(a,b) a>b?a:b
+	// replaces every getmax c 2 args -> the expression evaluates as if it was function
+
+// not affected by block structure because evaluates until it's undefined
+#define TABLE_SIZE 250
+int table0[TABLE_SIZE]; 	// effectively: 	int table0[250]
+#undef TABLE_SIZE
+#define TABLE_SIZE 200
+int table1[TABLE_SIZE]; 	// effectively: 	int table1[200]
+
+# special operators in function macros - replace arg c string literal of arg
+#define str(x) #x
+cout << str(sometxt); 		// effectively: 	cout << "sometxt"
+
+# special op in func macros - concatenate 2 args c no blank spaces
+#define combo(a,b) a ## b
+combo(c,out) << "sometxt"; 	// effectively: 	cout << "sometxt"
+	// - tricky bc macro defs replace BEFORE ANY syntax checks
+	// - tricky bc code becomes less readable if heavy use
+	// - tricky bc syntax in many cases very different from normal C++ expressions
