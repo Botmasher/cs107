@@ -1691,3 +1691,102 @@ int main () {
 	std::cout << " at time " << __TIME__ << ". Compiler __cplusplus value of " << __cplusplus << '\n';
 	return 0;
 }
+
+
+/*
+ * 	File Input/Output
+ */
+
+// stream classes (derived directly from istream, from which we've been using cin, and ostream, cout)
+#include <ofstream> 	// write
+#include <ifstream> 	// read
+#include <fstream> 		// both read and write
+	// the diff from cin and cout is the use of physical files
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main () {
+	ofstream myfile;
+	myfile.open ("example.txt"); 		// create file
+	myfile << "Writing to file.\n"; 	// write filestream
+	myfile.close(); 					// close file
+	return 0;
+}
+
+// open a file - assoc to real file
+fileobj.open (filename, mode); 	// string is filename
+	// mode is optional param
+	// ios::in  	open for input ops
+	// ios::out 	open for output ops
+	// ios::binary 	open in binary mode
+	// ios::ate 	set the initial position at the end of file (instead of beginning)
+	// ios::app 	all output ops are performed at end of file (appended)
+	// ios::trunc 	if file is opened and already exists, delete prev content and replace by new
+
+// can combine modes c bitwise OR |
+ofstream myf;
+myf.open ("example.bin", ios::out | ios::app | ios::binary);
+
+// open member functions have default mode
+	// ofstream 	ios::out 					assumed even if only ios::in passed in
+	// ifstream 	ios::in 					assumed even if only ios::out passed in
+	// fstream 		ios::in | ios::out 			default value OVERRIDDEN if another mode passed in
+
+// binary mode io ops are independent of formatting; non-binary text may format special chars
+	// - like newline or carriage return
+
+// stream classes have constructor that automatically opens the file - also valid way to open file!
+ofstream fileobj ("example.bin", ios::out | ios::app | ios::binary);
+
+// member func is_open to check success
+if (fileobj.is_open()) { /* do something w input and output */ }
+
+// close a file - notify operating system and free up resources
+	// - flushes associated buffers and closes the file
+	// - can now use stream obj to open another file
+	// - file is free to open by other processes
+	// - if obj destroyed while associated c open file, destructor auto calls .close
+fileobj.close();
+
+// Text files - writing to files without ios::binary so they're non-binary
+#include <iostream>
+#include <fstream>
+using namespace std;
+int main () {
+	ofstream myf ("example.txt");
+	if (myf.is_open()) {
+		myf << "Writing a line.\n";
+		myf.close();
+	}
+	else cout << "Could not open file";
+	return 0;
+}
+
+// Text files - reading from files without ios::binary
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+int main () {
+	string line;
+	ifstream f ("example.txt");
+	if (f.is_open()) {
+		while ( getline (f,line) ) { 	// true while stream itself ready for more ops
+										// false if end of file or some error
+			cout << line << '\n';
+		}
+		f.close()
+	}
+	else cout << "Could not open file";
+	return 0;
+}
+
+// checking state flags - all return boolean
+f.bad() 	// true if read or write fails, e.g. write to unopened file or to device with no space
+f.fail() 	// true if bad() PLUS if format error, e.g. alpha char extracted while trying to read integer
+f.eof() 	// true if file open for reading has reached end
+f.good() 	// false if any of the above would return true (very generic; NOT just the opp of bad)
+// reset the state flags
+f.clear()
