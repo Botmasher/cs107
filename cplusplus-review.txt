@@ -1790,3 +1790,69 @@ f.eof() 	// true if file open for reading has reached end
 f.good() 	// false if any of the above would return true (very generic; NOT just the opp of bad)
 // reset the state flags
 f.clear()
+
+// stream object keeps at least one internal position
+	// get pos: ifstream (like istream) keeps the loc of element to be read in next input op
+	// put pos: ofstream (like ostream) keeps the loc of where next element must be written
+	// fstream keeps both get and put
+f.tellg() 	// return the value of get position (of member type streampos)
+f.tellp() 	// return the value of put position (of member type streampos)
+
+// change the values - counting from the beginning of the file
+f.seekg(position);
+f.seekp(position);
+
+// other option with 2 params - offset is one of ios::beg, ios::cur, ios::end
+f.seekg(offset, direction);
+f.seekg(offset, direction);
+
+...
+int main () {
+	streampos begin, end; 						// notice the type STREAMPOS not INT
+	ifstream f ("example.bin", ios::binary); 	// open the file using constructor
+	begin = f.tellg();							// the first position for reading lines in
+	f.seekg (0, ios::end); 						// move to end
+	end = f.tellg(); 							// final read position
+	f.close();
+	// streampos can be added/subtracted against each other
+	cout << "file size: " << (end-begin) << " bytes\n";
+	return 0;
+}
+
+// streampos for position is just an alias of ios::pos_type
+// streamoff for offset is just an alias of ios::off_type
+	// the non-member types (ios::...) are more generic and apply even when streams use odd characters
+
+// binary files
+	// - extraction << and insertion >> ops are not efficient
+	// - functions like getline are not efficient
+	// - bc data not being formatted
+	// - and bc data isn't in neat lines
+// write and read funcs (inherited members of ostream into ofstream and istream to ifstream, and fstream has both)
+write (memory_block, size);
+read (memory_block, size);
+	// memory_block is char* for the address of array of bytes where read data stored
+	// size is integer specifying num chars to read or write from/to the block
+...
+int main () {
+	streampos size;
+	char * memblock;
+	ifstream f ("example.bin", ios::in|ios::binary|ios::ate) {
+		size = f.tellg(); 				// bc you're at end of file
+		memblock = new char [size]; 	// buffer large enough to hold file
+		f.seekg (0, ios::beg); 			// set to beginning of file
+		f.read (memblock, size);
+		f.close();
+		cout << "Entire file content is now in memory";
+		delete[] memblock;
+	}
+	else cout << "Unable to open file";
+	return 0;
+}
+
+// buffers and synchronization - streambuf
+	// - put to buffer instead of physical medium
+	// - when file closed: buffers not flushed are synchronized, data written/read to physical medium
+	// - when buffer full: automatically synchronized
+	// - explicit manipulators: flush and endl explicitly manipulate (synchronize) the stream buffer
+	// - explicit member func: sync() immed sync and return int equal to 0 (or -1 if no buffer or if failure)
